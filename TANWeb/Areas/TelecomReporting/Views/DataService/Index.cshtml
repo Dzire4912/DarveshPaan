@@ -1,0 +1,113 @@
+﻿@model TAN.DomainModels.Models.DataServiceModel
+@{
+    Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Data Service</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Data Service</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-12 align-self-center mb-2">
+            <div class="d-flex no-block justify-content-lg-end justify-content-md-end justify-content-sm-start align-items-center">
+                    @*<button type="button" id="btnAddDataService" class="btn waves-effect waves-light btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#DataServiceModal">*@
+                <button type="button" id="btnAddDataService" class="btn waves-effect waves-light btn-secondary float-right" onclick="openDataServiceModal();">
+                    <i class="ri-add-fill me-1 align-bottom"></i>
+                        New Data Service
+                    </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <div class="row gy-3 custom-select-arrow">
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 col-sm-12">
+                                        <div class="overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Facility</label>
+                                            <div class="clearfix"></div>
+                                            <select id="facilityLocationId" class="select2">
+                                                @foreach (var item in Model.facilityLocationAccesses)
+                                                {
+                                                    <option value="@item.FacilityID">@item.FacilityName - @item.LocationId</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
+                                        <div class="overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Service</label>
+                                            <div class="clearfix"></div>
+                                            <select id="ServiceListId" class="select2">
+                                                <option value="">Select Service</option>
+                                                @foreach (var item in Model.ServiceList)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnSearch" onclick="applyFilters()" type="button" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnClear" type="button" onclick="clearFilters()" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12">
+            @Html.Partial("GetDataServiceList")
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DataServiceModal" tabindex="-1" aria-labelledby="DataServiceModalLabel" aria-hidden="true">
+    @Html.Partial("DataService",Model.addDataService)
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/scripts/inputvalidation.js"></script>
+    <script src="~/scripts/Telecom/DataService.js"></script>
+    <script>
+
+    </script>
+}

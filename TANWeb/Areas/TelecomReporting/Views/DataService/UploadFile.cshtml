@@ -1,0 +1,286 @@
+﻿@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.ViewModels.UploadClientFileDetailsViewModel
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Data Service (OCR) Upload</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">OCR Upload File</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-12 align-self-center">
+            <div class="d-flex no-block justify-content-end align-items-center">
+                <button type="button" id="btnUploadFile" class="btn waves-effect waves-light btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#UploadFileModal">
+                    <i class="ri-upload-line pe-1 align-bottom"></i>Upload File
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="container-fluid pt-2">
+        <div class="row">
+            <div class="col-xl-12 px-0">
+                <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseOne"
+                                    aria-expanded="false"
+                                    aria-controls="flush-collapseOne">
+                                <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne"
+                             class="accordion-collapse collapse"
+                             aria-labelledby="flush-headingOne"
+                             data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body bg-light">
+                                <div class="live-preview">
+                                    <div class="row gy-3 custom-select-arrow">
+                                        @if (Model.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                        {
+                                            <div class="col-xxl-3 col-lg-3 col-xl-4 col-md-3 col-sm-12">
+                                                <div class="overlap-input-field">
+                                                    <label for="placeholderInput" class="form-label">Organization Name</label>
+                                                    <div class="clearfix"></div>
+                                                    <select id="organizationNameFilter" class="select2" onchange="getOrgFacilitiesForFilter()">
+                                                        <option value="0">Select Organization Name</option>
+                                                        @foreach (var organization in Model.OrganizationList)
+                                                        {
+                                                            <option value="@organization.Value">@organization.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="col-xxl-3 col-lg-3 col-xl-4 col-md-3 col-sm-12">
+                                            <div class="overlap-input-field">
+                                                <label for="placeholderInput" class="form-label">Facility Name</label>
+                                                <div class="clearfix"></div>
+                                                <select id="facilityNameFilter" class="select2">
+                                                    <option value="0">Select Facility Name</option>
+                                                    @foreach (var facility in Model.FacilityList)
+                                                    {
+                                                        <option value="@facility.Value">@facility.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-3 col-xl-4 col-md-3 col-sm-12">
+                                            <div class="overlap-input-field">
+                                                <label for="placeholderInput" class="form-label">Carrier Name</label>
+                                                <div class="clearfix"></div>
+                                                <select id="carrierNameFilter" class="select2">
+                                                    <option value="0">Select Carrier Name</option>
+                                                    @foreach (var carrier in Model.CarrierList)
+                                                    {
+                                                        <option value="@carrier.Value">@carrier.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-3 col-xl-4 col-md-6 d-flex align-items-end">
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" fdprocessedid="8hkutvc"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                                <div class="d-flex gap-1 flex-wrap">
+                                                    <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center" fdprocessedid="j8azn"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-12 px-0">
+                <div class="card rounded-0">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table display table-bordered table-striped no-wrap w-100 data-service-upload-file-table" id="clientFilesTable">
+                                <thead>
+                                    <tr>
+                                        <th data-column-name="Organization Name">Organization Name</th>
+                                        <th data-column-name="Facility Name">Facility Name</th>
+                                        <th class="carrierName-th" data-column-name="Carrier Name">Carrier Name</th>
+                                        <th data-column-name="File Name">File Name</th>
+                                        <th class="fileSize-th" data-column-name="File Size">File Size</th>
+                                        <th class="uploadedDate-th" data-column-name="Uploaded Date">Uploaded Date (UTC)</th>
+                                        <th class="isProcessed-th" data-column-name="Is Processed">Is Processed</th>
+                                        <th data-column-name="Action">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="UploadFileModal" tabindex="-1" aria-labelledby="UploadFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="UploadFileModalLabel">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-4 custom-select-arrow overlap-input-field">
+                        <div id="organizationNameDiv" class="form-group mb-2">
+                            <label class="control-label">Organization Name<span class="text-danger">*</span></label>
+                        </div>
+                        <select id="organizationName" class="select2" onchange="getOrgFacilities()">
+                            <option value="0">Select Organization Name</option>
+                            @foreach (var organization in Model.OrganizationList)
+                            {
+                                <option value="@organization.Value">@organization.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-4 custom-select-arrow overlap-input-field">
+                        <div id="facilityNameDiv" class="form-group mb-2">
+                            <label class="control-label">Facility Name<span class="text-danger">*</span></label>
+                        </div>
+                        <select id="facilityName" class="select2">
+                            <option value="0">Select Facility Name</option>
+                            @foreach (var facility in Model.FacilityList)
+                            {
+                                <option value="@facility.Value">@facility.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-4 custom-select-arrow overlap-input-field">
+                        <div id="carrierNameDiv" class="form-group mb-2">
+                            <label class="control-label">Carrier Name<span class="text-danger">*</span></label>
+                        </div>
+                        <select id="carrierName" class="select2">
+                            <option value="0">Select Carrier Name</option>
+                            @foreach (var carrier in Model.CarrierList)
+                            {
+                                <option value="@carrier.Value">@carrier.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-12 mt-2">
+                        <label for="placeholderInput" class="form-label">Upload File <span class="text-danger">*</span></label>
+                        <input type="file" id="fileUpload" class="fileUpload" />
+                    </div>
+                    <div class="col-lg-4 col-sm-12 mt-2">
+                        <label for="file" class="control-label">
+                            <a href="#" class="info" data-plugin-tooltip="tooltip" data-toggle="tooltip" data-placement="top" title="CSV, XLS, XLXS, and XML file formats are supported">
+                                <i class="fa fa-question-circle"></i>
+                            </a>
+                        </label>
+                        <div class="clearfix"></div>
+                        <label class="control-label">Upload from OneDrive </label>&nbsp;
+                        <input type="checkbox" id="onedrive" value="1" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearUploadFileDetails()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="fileModal" tabindex="-1">
+    <div class="modal-dialog FileView-Modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">File Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeFileViewModal()"></button>
+            </div>
+            <div class="modal-body" id="fileModalContent">
+                <iframe id="pdfViewer" class="iFrame-view-file"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeFileViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="imageModal" tabindex="-1">
+    <div class="modal-dialog imageView-Modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">File Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeFileViewModal()"></button>
+            </div>
+            <div class="modal-body" id="fileModalContent">
+                <img id="imageViewer" class="modal-content" style="height:450px;" alt="Image Viewer">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeFileViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <script src="~/Scripts/Telecom/UploadClientFile.js"></script>
+        <script src="~/Scripts/fileuploadinput.js"></script>
+        <script src="https://js.live.net/v7.0/OneDrive.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                loadAllFilesFromAzureStorage();
+                initSelect2ForUploadClientFile();
+                // Get a reference to the checkbox element by its ID
+                let checkbox = document.getElementById("onedrive");
+
+                // Add a click event listener to the checkbox
+                checkbox.addEventListener("click", function () {
+                    // Check if the checkbox is checked
+                    if (checkbox.checked) {
+                        processOneDriveInUploadClientFile();
+                    }
+                });
+            });
+
+            $('#btnClear').click(function (e) {
+                clearFilter();
+                $('#clientFilesTable').dataTable().fnDestroy();
+                loadAllFilesFromAzureStorage();
+            });
+            $('#btnSearch').click(function (e) {
+                $('#clientFilesTable').dataTable().fnDestroy();
+                loadAllFilesFromAzureStorage();
+            });
+        </script>
+    }
+    }

@@ -1,0 +1,67 @@
+﻿@model TAN.DomainModels.Models.EmployeePopupModel
+<form id="EmployeeDataFormInReview" method="post" asp-antiforgery="true">
+    <input type="hidden" class="form-control" id="EmployeeId" />
+    <div class="row">
+        <div class="form-group col-lg-12 mb-3">
+            <label class="control-label">Employee Id <span class="text-danger">*</span></label>
+            <input type="text" id="Employee_Id" class="form-control fieldRequired" maxlength="30" onkeypress="allowAlphaNumeric(event)" />
+            <span class="text-danger errormsg" title="Employee Id" id="Employee_IdError"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-6 mb-3">
+            <label class="control-label">First Name</label>
+            <input type="text" id="FirstName" class="form-control" onkeydown="restrictInput(event)" />
+            <span class="text-danger errormsg" title="First Name" id="FirstNameError"></span>
+        </div>
+        <div class="form-group col-lg-6 mb-3">
+            <label class="control-label">Last Name</label>
+            <input type="text" id="LastName" class="form-control" onkeydown="restrictInput(event)" />
+            <span class="text-danger errormsg" title="Last Name" id="LastNameError"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-6 mb-3">
+            <label class="control-label">Hire Date <span class="text-danger"></span></label>
+            <input type="date" id="HireDate" class="form-control  " />
+            <span class="text-danger errormsg" title="Hire Date" id="HireDateError"></span>
+        </div>
+        <div class="form-group col-lg-6 mb-3">
+            <label class="control-label">Termination Date <span class="text-danger"></span></label>
+            <input type="date" id="TerminationDate" class="form-control  " />
+            <span class="text-danger errormsg" title="Termination Date" id="TerminationDateError"></span>
+        </div>
+    </div>
+    <div class="row custom-select-arrow">
+        <div class="form-group mb-3 col-lg-6">
+            <div id="PayTypeDiv" class="">
+                <label class="control-label">Pay Type <span class="text-danger">*</span></label>
+                <select id="PayType" class="select2 fieldRequired">
+                    @foreach (var item in Model.PayType)
+                    {
+                        <option value="@item.PayTypeCode">@item.PayTypeDescription</option>
+                    }
+                </select>
+                <span class="text-danger errormsg" title="Pay Type" id="PayTypeError"></span>
+            </div>
+
+        </div>
+        <div class="form-group mb-3 col-lg-6">
+            <div id="JobTitleDiv" class="select2PayType">
+                <label class="control-label">Job Title<span class="text-danger">*</span></label>
+                <select id="JobTitle" class="select2 fieldRequired">
+                    @foreach (var item in Model.JobCode)
+                    {
+                        <option value="@item.Id">@item.Title</option>
+                    }
+                </select>
+                <span class="text-danger errormsg" title="Job Title" id="JobTitleError"></span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer py-0 pe-0">
+        <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveEmployeeFunction()" id="SaveEmployee">Save</button>
+        <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveEmployeeFunction()" id="UpdateEmployee">Update</button>
+        <button type="button" class="btn btn-secondary m-0 ms-2" id="btnClose" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>

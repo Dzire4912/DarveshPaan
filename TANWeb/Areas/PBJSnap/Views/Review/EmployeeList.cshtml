@@ -1,0 +1,379 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.EmployeeModel
+<div class="py-2 border-bottom title-part-padding d-flex justify-content-between align-items-center">
+    <div class="d-flex flex-column">
+        <h4 class="card-title mb-0">Staff</h4>
+        <h6>A list of staffing department details for the selected facility.</h6>
+    </div>
+
+
+    <div class="d-flex">
+        @if ((AuthorizationService.AuthorizeAsync(User,
+        Permissions.EmployeeMaster.PBJSnapCreate)).Result.Succeeded)
+        {
+            <button type="button" data-bs-toggle="modal" onclick="openEmployeeMoal()" data-bs-target="#AddEmployeeModel" class="btn waves-effect waves-light btn-info me-2 btn-sm"> <i class="ri-add-line pe-1"></i> Add</button>
+        }
+        <button type="button" class="btn waves-effect waves-light btn-info me-2 btn-sm" onclick="openStaffExportModal()"> <i class="ri-upload-line pe-1"></i> Export</button>
+    </div>
+    @*
+    @if ((AuthorizationService.AuthorizeAsync(User,
+    Permissions.EmployeeMaster.PBJSnapCreate)).Result.Succeeded)
+    {
+    <div>
+    <button type="button" data-bs-toggle="modal" onclick="openEmployeeMoal()" data-bs-target="#AddEmployeeModel" class="btn waves-effect waves-light btn-info d-flex btn-sm"> <i class="ri-add-line pe-1"></i> Add</button>
+
+    </div>
+    }*@
+</div>
+<div class="card-body">
+    <div class="table-responsive m-t-40">
+        <table id="EmployeeListTable" class="table display table-bordered table-striped no-wrap mb-0 w-100 review-emp-list-table">
+            <thead>
+                <tr>
+                    <th class="calender-th"></th>
+                    <th class="id-th">ID</th>
+                    <th class="name-th">Name</th>
+                    <th class="hire-date-th">Hire Date</th>
+                    <th class="term-date-th">Termination Date</th>
+                    <th class="pay-type-th">Pay Type</th>
+                    <th class="job-title-th">Job Title</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="jobTitileColumn">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="AddEmployeeModel" tabindex="-1" aria-labelledby="AddEmployeeModelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2 ">
+                <h5 class="modal-title" id="EmployeeModalLabel">Add Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("EmployeeData", Model.employeePopupModel)
+                @* <partial name="~/Views/Review/EmployeeData.cshtml" model="Model.employeePopupModel" />*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EmployeeDataWorkingHoursCalenderModal" tabindex="-1" aria-labelledby="ReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header modal-colored-header bg-info text-white py-2 ">
+                <h5 class="modal-title" id="ReviewModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body pt-0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="card-body calender-sidebar">
+                                            <div class="row">
+                                                <div class="col-6 justify-content-between ">
+                                                    <span class="modal-title fs-4" id="ReviewModalEmpDetails"></span>
+                                                </div>
+                                                <div class="col-6 justify-content-between">
+                                                    <span class="modal-title fs-4" id="ReviewModalEmpDetails1"></span>
+                                                </div>
+                                                <div class="col-6 justify-content-between">
+                                                    <span class="modal-title fs-4" id="ReviewModalEmpDetails2"></span>
+                                                </div>
+                                                <div class="col-6 justify-content-between">
+                                                    <span class="modal-title fs-4" id="ReviewModalEmpDetails3"></span>
+                                                </div>
+                                            </div>
+                                            <div id="EmployeeWorkingHoursCalender"></div>
+                                            <a href="#" onclick="OpenMultipleDateRangeModal()"
+                                               data-bs-toggle="modal" class=" btn mt-3 btn-info w-100 waves-effect waves-light col-xl-4 text-center float-end ">
+                                                <i data-feather="plus" class="feather-sm"></i> Add Multiple Working Hours
+                                            </a>
+                                            <a href="#" onclick="OpenMultipleDateRangeDeleteModal()"
+                                               data-bs-toggle="modal" class=" btn mt-3 btn-danger w-100 waves-effect waves-light col-xl-4 text-center float-end ">
+                                                <i data-feather="plus" class="feather-sm"></i> Delete Multiple Working Hours
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="EmpAddUpdateWorkingHours" tabindex="-1" aria-labelledby="AddWorkingHoursLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header modal-colored-header bg-info text-white py-2 ">
+                <h5 class="modal-title" id="AddWorkingHoursLabel">Add Working details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group mb-3">
+                            <input type="hidden" disabled id="EmpTimesheetId" class="form-control" />
+                            <label class="control-label">Employee_Id <span class="text-danger">*</span></label>
+                            <input type="text" disabled id="EmployeeIdWorking" class="form-control " />
+                            <span class="text-danger errormsg" title="Employee Id" id="Employee_IdError"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Work Date <span class="text-danger">*</span></label>
+                            <input type="text" disabled id="EmpWorkDate" class="form-control " />
+                            <span class="text-danger errormsg" title="Work Date" id="EmpWorkDateError"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row custom-select-arrow">
+                    <div class="col-lg-6">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Hours Worked <span class="text-danger">*</span></label>
+                            <input type="number" id="EmpHoursWorked" class="form-control   " step="0.1" />
+                            <span class="text-danger errormsg" title="Hours Workd" id="EmpHoursWorkedError"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div id="EmpWorkingPayTypeDiv" class="form-group mb-3">
+                            <label class="control-label">Pay Type <span class="text-danger">*</span></label>
+                            <select id="EmpWorkingPayType" class="select2">
+                                @*<option value="" selected>Select Pay Type</option>*@
+                            </select>
+                            <span class="text-danger errormsg" title="Last Name" id="LastNameError"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row custom-select-arrow">
+                    <div class="col-lg-6">
+                        <div id="EmpWorkingJobTitleDiv" class="form-group">
+                            <label class="control-label">Job Title <span class="text-danger">*</span></label>
+                            <select id="EmpWorkingJobTitle" class="select2">
+                                @*<option value="" selected>Select Job Title</option>*@
+                            </select>
+                            <span class="text-danger errormsg" title="Hire Date" id="HireDateError"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pe-0 pt-0 ">
+                <button type="submit" class="btn waves-effect waves-light btn-info" id="btnSaveEmployeeWorkingHours" onclick="return SaveEmployeeWorkingHours()">Save</button>
+                <button type="submit" class="btn waves-effect waves-light btn-info" id="btnDeleteEmployeeWorkingHours" onclick="return deleteEmployeeWorkingHours()">Delete</button>
+                <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade none-border" tabindex="-1" id="AddUpdateMultipleEmpWorking">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center ">
+                <h4 class="modal-title"><strong>Add</strong> multiple working day and update hours</h4>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-warning py-2" role="alert">
+                                Please select and add the date from the date picker. If the working hours already exist in the system then it is going to update the data with the new data. Future dates will be Ignore.
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <input type="checkbox" class="form-check-input" value="1" onchange="switchToEmpConsecutiveDate()" id="SwitchEmpConsecutiveDateToBasicDate" /> <span>Switch to Consecutive Days</span>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3" id="EmpWorkDateNonConsecutiveDiv">
+                            <div class="d-flex align-items-end">
+                                <div class="d-flex flex-column w-100">
+                                    <label class="control-label">Work Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="SelectDateId" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <a class="btn btn-primary ms-2 text-nowrap" onclick="AddDatesFunction()">Add Date</a>
+                            </div>
+                            <span class="text-danger errormsg" title="Date" id="SelectDateIdError"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-3" id="EmpWorkDateRangeDiv" style="display:none">
+                                <label class="control-label">Work Date <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="EmpDateRangeCalender" name="daterange" value="@DateTime.Now - @DateTime.Now" />
+                                <span class="text-danger errormsg" title="Work Date" id="EmpDateRangeCalenderError"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 date-lists-section mb-3" id="divDateList" style="cursor:pointer">
+                            <span id="dateList" class="mb-1 mt-2 me-2 badge font-medium bg-light-primary text-primary"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="control-label">Hours Worked <span class="text-danger">*</span></label>
+                                <input type="number" id="Emp_HoursWorked" class="form-control " step="0.1" />
+                                <span class="text-danger errormsg" title="Hours Workd" id="Emp_HoursWorkedError"></span>
+                            </div>
+                        </div>
+                        <div id="Emp_WorkingPayTypeDiv" class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="control-label">Pay Type <span class="text-danger">*</span></label>
+                                <select id="Emp_WorkingPayType" class="select2">
+                                </select>
+                                <span class="text-danger errormsg" title="Last Name" id="LastNameError"></span>
+                            </div>
+                        </div>
+                        <div id="Emp_WorkingJobTitleDiv" class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Job Title <span class="text-danger">*</span></label>
+                                <select id="Emp_WorkingJobTitle" class="select2">
+                                </select>
+                                <span class="text-danger errormsg" title="Hire Date" id="HireDateError"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer pt-0">
+                    <button type="button"
+                            class="btn btn-info waves-effect waves-light save-category"
+                            onclick="return multipleAddUpdateWorking()">
+                        Save
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary waves-effect"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade none-border" id="DeleteMultipleEmpWorking">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center ">
+                <h4 class="modal-title"><strong>Delete</strong> multiple working days.  Future dates will be Ignore.</h4>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-warning py-2" role="alert">
+                                Please select and add the date from the date picker.
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <input type="checkbox" class="form-check-input" value="1" onchange="switchToDeleteEmpConsecutiveDate()" id="SwitchDeleteEmpConsecutiveDateToBasicDate" /> <span>Switch to Consecutive Days</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-3" id="EmpDeleteWorkDateNonConsecutiveDiv">
+                            <div class="form-group d-flex align-items-end">
+                                <div class="d-flex flex-column w-100">
+                                    <label class="control-label">Work Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="DeleteSelectDateId" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <a class="btn btn-primary ms-2 text-nowrap" onclick="DeleteDatesFunction()">Add Date</a>
+                            </div>
+                            <span class="text-danger errormsg" title="Date" id="DeleteSelectDateIdError"></span>
+                        </div>
+                        <div class="col-md-12" id="EmpDeleteWorkDateRangeDiv" style="display:none">
+                            <div class="form-group mb-3">
+                                <label class="control-label">Work Date <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="EmpDeleteDateRangeCalender" name="daterange" value="@DateTime.Now.AddDays(-1) - @DateTime.Now" />
+                                <span class="text-danger errormsg" title="Work Date" id="EmpDateRangeCalenderError"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 date-lists-section" id="divDeleteDateList" style="cursor:pointer">
+                            <span id="dateList" class="mb-1 badge font-medium bg-light-primary text-primary me-2"></span>
+                        </div>
+
+                    </div>
+                </form>
+                <div class="modal-footer pt-0">
+                    <button type="button"
+                            class="btn btn-info waves-effect waves-light save-category"
+                            onclick="return deleteMultipleWorking()">
+                        Delete
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary waves-effect"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ExportEmpolyeeModal" tabindex="-1" aria-labelledby="ExportEmpolyeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="EmployeeModalLabel">Export Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-lg-12 custom-select-arrow">
+                    <div class="form-group mb-3">
+                        <div id="" class="">
+                            <label class="control-label">Pay Type <span class="text-danger">*</span></label>
+                            <select id="StaffExportPayType" class="form-select ">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <div id="" class="select2PayType custom-job-title">
+                            <label class="control-label">Job Title <span class="text-danger">*</span></label>
+                            <select id="StaffExportJobTitle" class="form-select ">
+                            </select>
+                            @*<span class="text-danger errormsg" title="Job Title" id="JobTitleError"></span>*@
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <div id="" class="">
+                            <label class="control-label">Format Type <span class="text-danger">*</span></label>
+                            <input type="radio" name="radioFormatType" id="RadioCSV" value="1" /> CSV
+                            <input type="radio" name="radioFormatType" id="RadioPDF" value="2" checked /> PDF
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer pe-0 pt-0 pb-0">
+                    <button type="submit" class="btn waves-effect waves-light btn-info" id="btnExportEmpolyeeModal" onclick="exportStaff()">Export</button>
+                    <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal" onclick="clearSessionVariables()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

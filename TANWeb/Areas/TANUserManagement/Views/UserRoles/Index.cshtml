@@ -1,0 +1,348 @@
+﻿@model TAN.DomainModels.ViewModels.ManageUserRolesViewModel
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+        ViewData["Title"] = "Assign Roles";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+        ViewData["Title"] = "Assign Roles";
+    }
+}
+
+        <div class="page-breadcrumb pt-2">
+            <div class="row">
+                <div class="col-xl-12 align-self-center">
+                    <h4 class="page-title">@ViewData["Title"] to  <span class="text-primary">@Model.UserName</span></h4>
+                    <div class="d-flex align-items-center">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                                <li class="breadcrumb-item active"><a asp-controller="Userroles" asp-action="Index" asp-route-UserId="@Model.UserId">@ViewData["Title"]</a></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="container-fluid main-content-height pt-0">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-headingOne">
+                                <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseOne"
+                                        aria-expanded="false"
+                                        aria-controls="flush-collapseOne">
+                                    <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filters</span>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOne"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="flush-headingOne"
+                                 data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body bg-light">
+                              <div class="live-preview mb-3">
+                                <div class="row g-3 mb-4 align-items-end">
+                                    <div id="appFilter" class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                                <label for="placeholderInput" class="form-label">Applications</label>
+                                                <select class="form-select select2" onchange="GetusRoles()" id="usAppName" asp-items="@(new SelectList(Model.AppItems, "Value", "Text"))">
+                                                    <option value="" selected>Select Application</option>
+                                                </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                                <label for="placeholderInput" class="form-label">Role</label>
+                                                <select class="form-select select2" id="usRoleName" asp-items="@(new SelectList(Model.RoleItems, "Value", "Text"))">
+                                                    <option value="" selected>Select Role</option>
+                                                </select>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-12 col-lg-4 col-xl-2 me-3 btn-width">
+                                                <div class="d-flex gap-1 flex-wrap">
+                                                    <button type="button" onclick="searchUserRoles()" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                                    <div class="d-flex gap-1 flex-wrap">
+                                                        <button type="button" onclick="resetUserRoleFilter()" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                                    </div>
+                                                </div>
+
+                                    </div>
+
+                                </div>
+                              </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="card">
+                        @*<div class="card-header align-items-center d-flex">
+                        <h4 class="card-title mb-0 flex-grow-1">@ViewData["Title"] to  <span class="text-primary">@Model.UserName</span></h4>
+                        </div><!-- end card header -->*@
+                        <div class="card-body">
+                            <div id="viewAll" class="live-preview">
+                                <form asp-controller="userroles" method="post" asp-action="update" asp-route-id="@Model.UserId" class="d-inline">
+                                    <input asp-for="@Model.UserId" id="Uid" type="hidden" />
+                                    <div class="table-responsive">
+                                        <table class="table display table-bordered table-striped no-wrap" id="userRolesTable">
+                                            <thead>
+
+
+                                                <tr>
+                                                    <th scope="col">
+                                                        Role
+                                                    </th>
+                                                    <th scope="col">
+                                                        Application
+                                                    </th>
+                                                    <th scope="col">
+                                                        Status
+                                                    </th>
+                                                    <th scope="col">
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @for (int i = 0; i < Model.UserRoles.Count(); i++)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input asp-for="@Model.UserRoles[i].RoleName" class="RoleChkBox" type="hidden" />
+                                                            @Model.UserRoles[i].RoleName
+                                                        </td>
+                                                        <td class="appName">
+                                                            <input asp-for="@Model.UserRoles[i].AppName" class="RoleChkBox" type="hidden" />
+                                                            @Model.UserRoles[i].AppName
+                                                            <input asp-for="@Model.UserRoles[i].AppId" type="hidden" value="@Model.UserRoles[i].AppId" />
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-check m-1">
+
+                                                                <input asp-for="@Model.UserRoles[i].Selected" class="form-check-input rolesCheck" />
+                                                                <input asp-for="@Model.UserRoles[i].RoleId" type="hidden" value="@Model.UserRoles[i].RoleId" />
+
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <a style='margin-right:16px' asp-area="TANUserManagement"
+                                                                   asp-controller="Permission" asp-action="Index"
+                                                                   asp-route-roleId="@Model.UserRoles[i].RoleId">
+                                                                    <i class="fas fa-wrench"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+
+                                    <div class="col-sm-12">
+                                        <div class="d-flex justify-content-end mt-2 pt-1 ">
+                                            <button type="submit" id="save" class="btn waves-effect waves-light btn-info">
+                                                @*<i class="fa fa-check me-2"></i>*@
+                                                Save
+                                            </button>
+
+                                            <a href="/users"
+                                               class="btn cancel-btn waves-effect waves-light shadow-none ms-2 text-light">
+                                                Cancel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!--end row-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end col-->
+            </div>
+        </div>
+
+@*<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-end">
+                    
+
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a asp-controller="IHCDashboard" asp-action="Index">Dashboard</a></li>
+                            <li class="breadcrumb-item active"><a asp-controller="Userroles" asp-action="Index" asp-route-UserId="@Model.UserId">@ViewData["Title"]</a></li>
+                        </ol>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header align-items-center d-flex">
+                        <h4 class="card-title mb-0 flex-grow-1">@ViewData["Title"] to  <span class="text-primary">@Model.UserName</span></h4>
+                    </div><!-- end card header -->
+                    <div class="card-body">
+                        <div id="viewAll" class="live-preview">
+                            <form asp-controller="userroles" method="post" asp-action="update" asp-route-id="@Model.UserId" class="d-inline">
+                                <input asp-for="@Model.UserId" type="hidden" />
+                                <table class ="table display table-bordered table-striped no-wrap" id="userRolesTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                Role
+                                            </th>
+                                            <th scope="col">
+                                                Application
+                                            </th>
+                                            <th scope="col">
+                                                Status
+                                            </th>
+                                            <th scope="col">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @for (int i = 0; i < Model.UserRoles.Count(); i++)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input asp-for="@Model.UserRoles[i].RoleName" class="RoleChkBox" type="hidden" />
+                                                    @Model.UserRoles[i].RoleName
+                                                </td>
+                                                <td class ="appName">
+                                                     <input asp-for="@Model.UserRoles[i].AppName" class="RoleChkBox" type="hidden" />
+                                                    @Model.UserRoles[i].AppName
+                                                    <input asp-for="@Model.UserRoles[i].AppId" type="hidden" value="@Model.UserRoles[i].AppId"/>
+                                                </td>
+                                                <td >
+                                                    <div class="form-check m-1">
+                                                 
+                                                        <input asp-for="@Model.UserRoles[i].Selected" class="form-check-input rolesCheck" />
+                                                        <input asp-for="@Model.UserRoles[i].RoleId" type="hidden" value="@Model.UserRoles[i].RoleId" />
+
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <div>
+                                                    <a style='margin-right:16px' asp-area="TANUserManagement"
+                                                     asp-controller="Permission" asp-action="Index"
+                                                       asp-route-roleId="@Model.UserRoles[i].RoleId">
+                                                        <i class="fas fa-wrench"></i> Manage Permissions
+                                                    </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <div class="col-sm-12">
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button type="submit" id="save" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-check"></i>
+                                            &nbsp Save &nbsp
+                                        </button>
+
+                                        <a href="/users"
+                                           class="btn btn-soft-dark btn-sm waves-effectwaves-light shadow-none ms-2">
+                                            Cancel
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                            <!--end row-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end col-->
+        </div>
+    </div>
+</div>*@
+
+@section PageScripts {
+    @{
+                <partial name="_ValidationScriptsPartial"></partial>
+
+       
+        <script>
+
+            
+            $(document).ready(function () {
+                
+                $('#userRolesTable').dataTable().fnDestroy();
+                $('#userRolesTable').dataTable(
+                {
+                    order: [],
+                        pagingType: "full_numbers",
+                        language: {
+                            paginate: {
+                                first: '<i class="fa fa-angle-double-left"></i>',
+                                previous: '<i class="fa fa-angle-left"></i>',
+                                next: '<i class="fa fa-angle-right"></i>',
+                                last: '<i class="fa fa-angle-double-right"></i>',
+                            }
+                        },
+                    columnDefs: [
+                        { orderable: false, targets: [2,3] }
+                    ]
+                });
+            });
+
+            $(document).on('click', '.rolesCheck', function () {
+                // Get the selected app name and role ID from the clicked checkbox row
+                var appName = $(this).closest('tr').find('.appName').text().trim();
+                var x = $(this).closest('tr').find('.rolesCheck');
+                var y=x.checked;
+              
+
+                 
+                // Collect only the app names from checked checkboxes, excluding the newly selected row
+                var selectedApps = [];
+                $('.rolesCheck:checked').each(function () {
+                     var rowAppName = $(this).closest('tr').find('.appName').text().trim();
+                        selectedApps.push(rowAppName);
+                        
+                    
+                });
+              
+                // Check if the app name already exists in the selectedApps array
+                var appExists = selectedApps.filter(function (app) {
+                    return app === appName;
+                }).length >= 2;
+
+
+                if (appExists) {
+                    // Display warning for duplicate app name
+                    ErrorMsg("Duplicate app name: " + appName, '', '');
+                    // Uncheck the new row checkbox
+                    $(this).prop('checked', false);
+                }
+
+                
+            });
+
+
+          
+
+        </script>
+
+    }
+    }

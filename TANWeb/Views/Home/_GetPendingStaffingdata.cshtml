@@ -1,0 +1,13 @@
+﻿@model TAN.DomainModels.Entities.ChartData
+@*<h4 class="card-title">Percentage of facilities started Upload - (this quarter)</h4>*@
+
+        <h4 class="card-title">% of facilities started Upload </h4>
+        <div id="pendingstaffdata" class="d-flex justify-content-center"></div>
+
+
+
+<script>
+    var mpartialViewModel = @Html.Raw(Json.Serialize(ViewBag.pendingStaffingdata));
+    GenerateSingleradialChart(mpartialViewModel, "pendingstaffdata");
+  //  generatePieChart(mpartialViewModel.data, mpartialViewModel.labels, "pendingstaffdata");
+</script>

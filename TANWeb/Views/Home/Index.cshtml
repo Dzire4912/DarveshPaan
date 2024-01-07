@@ -1,0 +1,232 @@
+﻿@*@{
+    ViewData["Title"] = "Home Page";
+}
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@inject IAuthorizationService AuthorizationService*@
+
+@*<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>*@
+@*<div>
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Dashboard.PBJSnapCreate)).Result.Succeeded)
+{
+    <button class="btn btn-success" id="pb" onclick="Navpbj()">MainCreate</button>
+}
+</div>*@
+@using TAN.DomainModels.ViewModels;
+@model TAN.DomainModels.ViewModels.DashboardViewModel;
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    ViewData["Title"] = "Dashboard";
+}
+@{
+    //PieChart
+    var chartData = ViewBag.ChartData;
+    string[] labels = chartData.Labels as string[];
+    int[] data = chartData.Data as int[];
+    //barChart
+    var barChartData = ViewBag.BarChartData;
+    string[] barlabels = barChartData.Labels as string[];
+    int[] bardata = barChartData.Data as int[];
+    //Labor type
+
+    var LabourChartData = ViewBag.BarChartLabourData;
+    string[] labourbarlabels = LabourChartData.Labels as string[];
+    int[] labourbardata = LabourChartData.Data as int[];
+}
+
+@*<style>
+    /* CSS styles for the chart container */
+    .chart-container {
+        width: 500px; /* Set the desired width */
+        height: 300px; /* Set the desired height */
+    }
+
+    #myChart > div:first-child {
+        margin: auto;
+    } 
+    #myLabourChart > div:first-child {
+        margin: auto;
+    }
+</style>*@
+
+
+    <div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="card-title mb-0 flex-grow-1">@ViewData["Title"]</h4>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-2">
+    <div class="row">
+        <div id="ThinkAnewTiles"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 d-flex align-items-stretch">
+            <partial name="_QuarterCards"></partial>
+        </div>
+        <div class="col-sm-12 col-lg-8">
+            <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="Staffing data count for each month">
+                <div class="card-body">
+                    <div id="Staffingdata"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="SecondaryTiles"></div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-lg-4 col-md-4 d-flex align-items-stretch">
+            <div class="card card-hover w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Pay type distribution based on employee module">
+                <div class="card-body">
+                    <h4 class="card-title">Paytype Distribution</h4>
+                        <div id="myChart"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12 col-lg-4 col-md-4 d-flex align-items-stretch">
+            <div class="card card-hover w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="percentage based on Submission Status of last quarter(Might not be actual)">
+                <div class="card-body" >
+                    <div id="SubmissionStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-lg-4 col-md-4 d-flex align-items-stretch">
+            <div class="card card-hover w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Labour code distribution(from Employee module)">
+                <div class="card-body">
+                    <h4 class="card-title">Labour Distribution Chart</h4>
+                    <div id="myLabourChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-4 d-flex align-items-stretch">
+            <div class="card card-hover w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Percentage of facilities Submitted data for last quarter">
+                <div class="card-body">
+                    <div id="SubmissionSData"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9 col-md-8 d-flex align-items-stretch">
+            <div class="card w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Top Labour Code across facilities from Timesheet">
+                <div class="card-body">
+                    <div id="GetLabourCodeTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9 col-md-8 d-flex align-items-stretch">
+            <div class="card w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Top 10 Job codes across facilities from TimeSheet">
+                <div class="card-body">
+                    <div id="GetTopJobTable"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-4 d-flex align-items-stretch">
+            <div class="card card-hover w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Started Uploading for this quarter">
+                <div class="card-body">
+                    <div id="Pendingdata"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 d-flex align-items-stretch">
+            <div class="card w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Top 15 Facilities with max employee count">
+                <div class="card-body analytics-info">
+                    <h4 class="card-title">Employee Distribution</h4>
+                    <div id="myBarChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12" style="padding-top: 20px; padding-bottom: 40px;">
+            <div id="GetFacilityTiles"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 d-flex align-items-stretch">
+            <div class="card w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Facilities in the Organization which are pending to submit">
+                <div class="card-body">
+                    <div id="PendingSubmission"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+    <div class="row">
+        <div class="col-lg-12" id="blogs">
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/scripts/chart.js"></script>
+    <script src="~/scripts/dashboard.js"></script>
+    <script>
+        var labels = @Html.Raw(Json.Serialize(labels));
+        var data = @Html.Raw(Json.Serialize(data));
+        var Blabels = @Html.Raw(Json.Serialize(barlabels));
+        var Bdata = @Html.Raw(Json.Serialize(bardata));
+        var Llabels = @Html.Raw(Json.Serialize(labourbarlabels));
+        var Ldata = @Html.Raw(Json.Serialize(labourbardata));
+
+        LoadThinkAnewTiles();
+        LoadStaffingData();
+        LoadSecondaryTiles();
+        LoadFacilityTiles();
+        LoadPreviousSubmission();
+        LoadpendingSubmission();
+        LoadSubmissionSatus();
+
+        //  createChart(labels, data, "myChart");
+        generatePieChart(data, labels, "myChart");
+        //  createBarChart(Blabels, Bdata);
+        generateBarChart(Bdata, Blabels, "myBarChart")
+        //generateBarChart(Ldata, Llabels, "myLabourChart");
+        //generatePieChart(Ldata, Llabels, "mynewLabourChart");
+        //generateBarChart(Bdata, Blabels, "myApexBarchart");
+       
+        LoadLabourTable();
+        LoadJobTable();
+        LoadPendingStaffingData();
+       
+        Loadblogs();
+        
+            
+        //generateEChartBar(data, labels, "basic-bar");
+        GeneratedonutApex(Ldata, Llabels, "myLabourChart");
+           
+    </script>
+
+    <script>
+
+
+    </script>
+}

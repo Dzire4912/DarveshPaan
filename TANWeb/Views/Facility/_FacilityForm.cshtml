@@ -1,0 +1,163 @@
+﻿@using TANWeb.Helpers;
+@model TAN.DomainModels.ViewModels.FacilityViewModel
+
+
+<div class="page-content">
+    <div class="container-fluid">
+        <form id="addFacilityForm" method="Post" asp-antiforgery="true">
+            <div>
+                <input type="hidden" id="id" />
+            </div>
+            <div class="row">
+                <div class="col-lg-6 custom-select-arrow">
+                    <div id="organizationIdDiv" class="form-group mb-2">
+                        <div class="input-group">
+                            <label asp-for="OrganizationId" class="control-label">Organization Name<span class="text-danger">*</span></label>
+                            <div class="input-group-append">
+                                <i class="fas fa-info-circle ms-1" data-toggle="tooltip" data-placement="top" title="If selected organization having Bandwidth access and if you want to add facility for this selected organization then application name dropdown reporting option will be auto selected "></i>
+                            </div>
+                        </div>
+                        <select asp-for="OrganizationId" id="facilityOrganizationName" class="select2" asp-items="@(new SelectList(Model.OrganizationList, "Value", "Text"))" onchange="getOrgServiceType()">
+                        </select>
+                        <span asp-validation-for="OrganizationId" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6 custom-select-arrow">
+                    <div id="applicationIdDiv" class="form-group mb-2">
+                        <label asp-for="ApplicationId" class="control-label">Application Name<span class="text-danger">*</span></label>
+                        <select asp-for="ApplicationId" id="facilityApplicationName" multiple class="select2" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                        </select>
+                        <span asp-validation-for="ApplicationId" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="LocationInformationDiv" style="display: none;">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group mb-2">
+                            <label asp-for="LocationId" class="control-label">Location Id</label>
+                            <input asp-for="LocationId" class="form-control" id="facilityLocationId" onkeypress="return allowOnlyDigits(event)" />
+                            <span asp-validation-for="LocationId" class="text-danger errormsg"></span>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group mb-2">
+                            <label asp-for="LocationDescription" class="control-label">Location Description</span></label>
+                            <input asp-for="LocationDescription" class="form-control" id="facilityDescription" />
+                            <span asp-validation-for="LocationDescription" class="text-danger errormsg"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="FacilityID" class="control-label">Facility Id<span class="text-danger">*</span></label>
+                        <input asp-for="FacilityID" class="form-control" id="facilityID" onkeypress="return isAlphaNumericOnly(event)" onblur="checkForUniqueId(this)" />
+                        <span asp-validation-for="FacilityID" class="text-danger errormsg" id="facilityId_Error"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="FacilityName" class="control-label">Facility Name<span class="text-danger">*</span></label>
+                        <input asp-for="FacilityName" class="form-control" id="facilityName" onblur="validateInputOnBlur(this)" />
+                        <span asp-validation-for="FacilityName" class="text-danger errormsg" id="facilityName_Error"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="Address1" class="control-label">Address 1<span class="text-danger">*</span></label>
+                        <input asp-for="Address1" class="form-control" id="facilityAddress1" onkeydown="restrictSpecialChars(event)" />
+                        <span asp-validation-for="Address1" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="Address2" class="control-label"></label>
+                        <input asp-for="Address2" class="form-control" id="facilityAddress2" onkeydown="restrictSpecialChars(event)" />
+                        <span asp-validation-for="Address2" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="City" class="control-label">City<span class="text-danger">*</span></label>
+                        <input asp-for="City" class="form-control" id="facilityCity" onkeydown="restrictInput(event)" />
+                        <span asp-validation-for="City" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6 custom-select-arrow">
+                    <div id="stateSelectDiv" class="form-group mb-2">
+                        <label asp-for="State" class="control-label">State<span class="text-danger">*</span></label>
+                        <select asp-for=State id="facilityState" class="select2" asp-items="@(new SelectList(Model.StateList, "StateCode", "StateName"))">
+                        </select>
+                        <span asp-validation-for="State" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="ZipCode" class="control-label">Zip Code<span class="text-danger">*</span></label>
+                        <input asp-for="ZipCode" class="form-control" id="facilityZipCode" onkeydown="allowOnlyDigits(event)" />
+                        <span asp-validation-for="ZipCode" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card bg-light-custom">
+                        <div class="card-body px-2 py-3">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group mb-2">
+                                        <label asp-for="HasDeduction" class="control-label">Has LunchTime Deduction?</label>
+                                        <input asp-for="HasDeduction" class="form-check-input" type="checkbox" id="hasDeduction" onclick="ShowDeduction()" />
+                                        <span id="spHasDeduction"  class="text-danger errormsg"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="Duduction" style="display: none;">
+                                <div class="col-lg-6">
+                                    <div class="form-group" id="regularTime">
+                                        <label class="control-label">Regular Time(mins) <i class="ri-information-line ps-1 text-warning fs-4" data-bs-toggle='tooltip' data-bs-placement='top' title='8 to 16 hours'></i> </label>
+                                        <input class="form-control" onfocus="ClearDeductionSpan" id="regularTimeValue" onkeydown="allowOnlyDigits(event)" />
+                                        <span class="text-danger errormsg"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group" id="overTime">
+                                        <label class="control-label">Over Time(mins) <i class="ri-information-line ps-1 text-warning fs-4" data-bs-toggle='tooltip' data-bs-placement='top' title='>16 hours'></i> </label>
+                                        <input class="form-control" onfocus="ClearDeductionSpan" id="overTimeValue" onkeydown="allowOnlyDigits(event)" />
+                                        <span asp-validation-for="ZipCode" class="text-danger errormsg"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6" >
+                                    <div class="form-group mb-2 default-checkbox d-flex align-items-center" id="Deduction">
+                                        <label class="control-label">Default Break Deduction <i class="ri-information-line px-1 text-warning fs-4" data-bs-toggle='tooltip' data-bs-placement='top' title='regular :30 mins overtime:60 mins'></i> </label>
+                                        <input type="checkbox" onclick="HideTimeInputs()" id="DefaultTime" class="form-check-input" />
+                                        <span class="text-danger errormsg"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal-footer py-0 pe-0 pt-0">
+                <button type="submit" class="btn waves-effect waves-light btn-info" id="btnSaveFacility">Save</button>
+                <button type="submit" class="btn waves-effect waves-light btn-info" style="display:none;" id="btnUpdateFacility">Update</button>
+                <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
+

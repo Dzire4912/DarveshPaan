@@ -1,0 +1,253 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    DateTime FirstQuarter = new DateTime(DateTime.Now.Year, 12, 31); // Replace with your start date
+    DateTime SecondQuarter = new DateTime(DateTime.Now.Year, 3, 31); // Replace with your end date
+    DateTime ThirdQuarter = new DateTime(DateTime.Now.Year, 6, 30); // Replace with your start date
+    DateTime FourthQuarter = new DateTime(DateTime.Now.Year, 9, 30); // Replace with your end date
+    
+    TimeSpan Firstdifference = FirstQuarter.AddDays(45)-DateTime.Now ;
+    TimeSpan Seconddifference = SecondQuarter.AddDays(45) - DateTime.Now;
+    TimeSpan Thirddifference = ThirdQuarter.AddDays(45) - DateTime.Now;
+    TimeSpan Fourthdifference = FourthQuarter.AddDays(45) - DateTime.Now;
+
+    int FirstdifferenceInDays = Firstdifference.Days;
+    int SeconddifferenceInDays = Seconddifference.Days;
+    int ThirddifferenceInDays = Thirddifference.Days;
+    int FourthdifferenceInDays = Fourthdifference.Days;
+}
+
+<div class="card w-100 card-hover" data-bs-toggle="tooltip" data-bs-placement="top" title="Past deadlines will be marked in red">
+    <div class="card-body" style="background: url(../../assets/images/active-bg.png) no-repeat top center;">
+        <div class="pt-3 text-center">
+            <i class="ri-calendar-2-fill display-4 text-orange d-block"></i>
+            <span class="display-8 d-block font-medium">Reporting Deadline</span>
+            <div class="row mt-5">
+                <div class="col-sm-12 col-lg-12">
+                    @if (DateTime.Now.Month == 1 || DateTime.Now.Month == 2 || DateTime.Now.Month == 3)
+                    {
+
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                    1st Quarter (Oct 1 - December 31)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (FirstdifferenceInDays >= 0)
+                                            {
+                                                <span>@FirstQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@FirstdifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@FirstQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@FirstdifferenceInDays days</span>
+                                            }
+                                        }
+                                        <span class="text-white op-5">All data for the 1st Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                    2nd Quarter (January 1 - March 31)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (SeconddifferenceInDays >= 0)
+                                            {
+                                                <span>@SecondQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@SeconddifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@SecondQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@SeconddifferenceInDays days</span>
+                                            }
+                                        }
+                                        <span class="text-dark op-5">All data for the 2nd Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (DateTime.Now.Month == 4 || DateTime.Now.Month == 5 || DateTime.Now.Month == 6)
+                    {
+
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                    2nd Quarter (January 1 - March 31)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+
+                                        @{
+                                            if (SeconddifferenceInDays >= 0)
+                                            {
+                                                <span>@SecondQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@SeconddifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@SecondQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@SeconddifferenceInDays days</span>
+                                            }
+                                        }
+
+                                        <span class="text-dark op-5">All data for the 2nd Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                    3rd Quarter (April 1 - June 30)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (ThirddifferenceInDays >= 0)
+                                            {
+                                                <span>@ThirdQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@ThirddifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@ThirdQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@ThirddifferenceInDays days</span>
+                                            }
+                                        }
+                                        <span class="text-dark op-5">All data for the 3rd Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (DateTime.Now.Month == 7 || DateTime.Now.Month == 8 || DateTime.Now.Month == 9)
+                    {
+
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                    3rd Quarter (April 1 - June 30)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (ThirddifferenceInDays >= 0)
+                                            {
+                                                <span>@ThirdQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@ThirddifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@ThirdQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@Math.Abs(@ThirddifferenceInDays) days</span>
+                                            }
+                                        }
+                                        <span class="text-dark op-5">All data for the 3rd Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                    4th Quarter (July 1 - September 30)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (FourthdifferenceInDays >= 0)
+                                            {
+                                                <span>@FourthQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@FourthdifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@FourthQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@FourthdifferenceInDays days</span>
+                                            }
+                                        }
+                                        <span class="text-dark op-5">All data for the 4th Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (DateTime.Now.Month == 10 || DateTime.Now.Month == 11 || DateTime.Now.Month == 12)
+                    {
+
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                     4th Quarter (July 1 - September 30)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (FourthdifferenceInDays >= 0)
+                                            {
+                                                <span>@FourthQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@FourthdifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@FourthQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@FourthdifferenceInDays days</span>
+                                            }
+                                        }
+                                        <span class="text-dark op-5">All data for the 4th Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card ">
+                            <div class="card-body p-0">
+                                <h4 class="card-title text-dark">
+                                     1st Quarter (Oct 1 - December 31)
+                                    
+                                </h4>
+                                <div class="d-flex align-items-center mt-3 justify-content-center">
+                                    <div>
+                                        @{
+                                            if (FirstdifferenceInDays >= 0)
+                                            {
+                                                <span>@FirstQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span>@FirstdifferenceInDays days</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@FirstQuarter.AddDays(45).ToString("MMMM d") :</span>
+                                                <span style="color: red;">@FirstdifferenceInDays days</span>
+                                            }
+                                        }
+                                        <span class="text-dark op-5">All data for the 1st Quarter must be submitted by 11:59pm.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+          
+        </div>
+    </div>
+</div>

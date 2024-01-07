@@ -1,0 +1,13 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model TAN.DomainModels.Entities.ChartData
+
+        <h4 class="card-title">Submission % - (Last quarter)</h4>
+        <div id="SubmissionData"></div>
+<script>
+    var mpartialViewModel = @Html.Raw(Json.Serialize(ViewBag.pendingStaffingdata));
+    GenerateSinglefilledradialChart(mpartialViewModel, "SubmissionData");
+      //  generatePieChart(mpartialViewModel.data, mpartialViewModel.labels, "pendingstaffdata");
+</script>

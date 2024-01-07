@@ -1,0 +1,130 @@
+﻿@model TAN.DomainModels.Models.UploadModel.ResponseUploadModel
+ 
+<div class="col-xl-12">
+    <div class="card">
+        <div class="card-header py-2 border-bottom bg-info text-white fs-4 rounded-0 d-flex">
+            <div class="card-title">
+                <h4 class="card-title mb-0">
+                    Map Column Headers
+                </h4>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 d-flex">
+                    <div class="card mapdata-table-wrapper mb-0 w-100">
+
+                        <div class="card-body p-0">
+                            <p class="text-muted fs-4">Map the target fields to your spreadsheet.</p>
+                            <div class="table-responsive bg-light">
+                                <table class="table table-hover customize-table mb-0 v-middle mapping-table" id="MapTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-bottom border-top">Target Fields</th>
+                                            <th class="border-bottom border-top"></th>
+                                            <th class="border-bottom border-top">Mapping Fields</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            if (Model != null && Model.previewTable != null)
+                                            {
+                                                foreach (System.Data.DataRow dr in Model.previewTable.Rows)
+                                                {
+                                                    <tr>
+                                                        <td class="excelcol">@dr["Column1"].ToString()</td>
+                                                        <td><i class="ri-arrow-right-line text-black-50 h3"></i></td>
+                                                        <td>
+                                                            <div class="mb-0 custom-select-arrow">
+                                                                <select class="form-select selectddl py-1 w-75">
+                                                                    <option value="">Ignore Field</option>
+                                                                    @foreach (var item in Model.CmsMappingFieldDataList)
+                                                                    {
+                                                                        if (item.Id.ToString() == @dr["Column2"].ToString())
+                                                                        {
+                                                                            <option value="@item.Id" selected>@item.FieldName</option>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="@item.Id">@item.FieldName</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border mb-0 pview-data-wrapper">
+                        <div class="card-header py-2 border-bottom bg-light">
+                            <div class="card-title">
+                                <h4 class="card-title mb-0">
+                                    Preview data
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="card-body p-2 pt-0">
+
+                            <div class="table-responsive">
+                                <table class="table table-striped customize-table mb-0 v-middle text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            @if (Model.previewTable?.Rows.Count > 0)
+                                            {
+                                                foreach (System.Data.DataColumn item in Model.UploadFileData.Columns)
+                                                {
+                                                    <th class="border-bottom">@item.ColumnName.ToString()</th>
+                                                }
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            if (Model.previewTable?.Rows.Count > 0)
+                                            {
+                                                int RowCount = 0;
+                                                for (int i = 0; i < Model.UploadFileData?.Rows.Count && RowCount < Model.UploadFileData?.Columns.Count; i++)
+                                                {
+                                                    RowCount++;
+                                                    System.Data.DataRow dataRow = Model.UploadFileData?.Rows[i];
+                                                    <tr>
+                                                        @foreach (var item in dataRow.ItemArray)
+                                                        {
+                                                            <td>  @item.ToString() </td>
+                                                        }
+                                                    </tr>
+
+                                                }
+                                                
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="d-flex no-block justify-content-end align-items-center">
+                        <button onclick="mapFunction()" type="button" class="d-flex align-items-center btn waves-effect waves-light btn-info float-right mt-3">
+                            <i class="ri-refresh-fill me-1"></i> Map
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
+
+
+

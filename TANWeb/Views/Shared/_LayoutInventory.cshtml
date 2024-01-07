@@ -1,0 +1,638 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService;
+@using TAN.DomainModels.Entities;
+@using TAN.DomainModels.Helpers;
+@using Microsoft.AspNetCore.Authorization;
+@using TAN.Repository.Abstractions;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject SignInManager<AspNetUser> SignInManager
+@inject UserManager<AspNetUser> UserManager
+@inject RoleManager<AspNetRoles> RoleManager
+@inject IUnitOfWork _uow
+@inject IConfiguration config
+@{
+    var user = await UserManager.GetUserAsync(User);
+    //var userRoles = await UserManager.GetRolesAsync(user);
+    var userRoles = _uow.AspNetUserRoleRepo.GetAll().Where(role => role.UserId == user.Id).ToList();
+    var userOrganizationId = 0;
+    var userOrganizationName = string.Empty;
+    @if (user.UserType == Convert.ToInt32(UserTypes.Other))
+    {
+        userOrganizationId = _uow.UserOrganizationFacilitiesRepo.GetAll().Where(uo => uo.UserId == user.Id).Select(uo => uo.OrganizationID).FirstOrDefault();
+        userOrganizationName = _uow.OrganizationRepo.GetAll().Where(o => o.OrganizationID == userOrganizationId).Select(o => o.OrganizationName).FirstOrDefault();
+    }
+    Context.Session.SetString("SelectedApp", "Inventory");
+}
+@{
+    var buildVersion = BuildVersion.version;
+    var description = EnumHelper.GetEnumDescription(buildVersion);
+}
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="keywords"
+          content="wrappixel, admin dashboard, html css dashboard, web dashboard, bootstrap 5 admin, bootstrap 5, css3 dashboard, bootstrap 5 dashboard, xtreme admin bootstrap 5 dashboard, frontend, responsive bootstrap 5 admin template, material design, material dashboard bootstrap 5 dashboard template" />
+    <meta name="description"
+          content="Xtreme is powerful and clean admin dashboard template, inpired from Google's Material Design" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>ThinkAnew</title>
+    <link rel="canonical" href="https://www.wrappixel.com/templates/xtremeadmin/" />
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="~/assets/images/favicon.png" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/assets/libs/apexcharts/dist/apexcharts.css" />
+    <!-- Custom CSS -->
+    <link href="~/css/inventory-style.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="~/assets/datatables.net-bs4/css/datatables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/assets/datatables.net-bs4/css/responsive.datatables.min.css" rel="stylesheet" />
+    <link href="~/chosen/chosen.css" rel="stylesheet" />
+    <link href="~/chosen/chosen.min.css" rel="stylesheet" />
+    <link href="~/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+
+
+    <link rel="stylesheet"
+          type="text/css"
+          href="~/assets/libs/select2/dist/css/select2.min.css" />
+
+</head>
+<body>
+    <div class="preloader">
+        <div class="loader-wrapper">
+            <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="-16 5.5 115.3 141.5" class="lds-ripple svg-loader " x="0px" y="0px" xml:space="preserve">
+            <circle class="cls-2" cx="42" cy="66" r="29" id="bulb-body-fill" />
+            <rect class="cls-1" x="33" y="130" width="21" height="3" />
+            <symbol id="triangle" viewBox="0 0 650 800"> 
+            <path class="cls-1" d="m389.02,35.33l-7.54-2.33c-24.67-7.63-50.06-11.49-75.48-11.49-141.17,0-256.02,114.85-256.02,256.02,0,37.39,7.87,73.42,23.41,107.09,9.84,21.34,22.64,41.26,38.03,59.19l2.76,3.27-.09.07,2.29,2.92c35.34,45,49.61,84.12,54.1,98.85l.86,2.81,2.93-.13c5.29-.24,10.53-.36,15.67-.44l4.76-.07-1.14-4.62c-1.93-7.85-5.91-18.49-11.82-31.64-.92-2.07-1.99-4.32-3.08-6.6-8.52-17.82-23.8-45.41-48.27-75.71l-1.74-2.15.06-.1-1.71-2.02c-13.61-16.06-24.95-33.83-33.69-52.8-14.2-30.79-21.4-63.73-21.4-97.92,0-129.07,105.01-234.08,234.08-234.08,26.85,0,53.31,4.59,78.61,13.64,92.98,33.26,155.46,121.85,155.46,220.44,0,34.19-7.2,67.13-21.4,97.92-8.78,19.05-20.2,36.91-33.94,53.08l-1.51,1.88.03.07-1.64,2.04c-24.49,30.33-39.77,57.92-48.28,75.71-1.09,2.28-2.16,4.53-3.07,6.58-8.32,18.51-12.74,31.34-13.49,38.93-1.75,9.95-2.71,19.58-2.86,28.65l-.06,4.15h-60.43v-265.61h80.87v-98.56H177.7v98.56h78.85v275.75h-83.33v72.56h245.36v30.72h-248.08v21.95h270.02v-74.6h-245.36v-28.68h83.34v-319.25h-79.24v-55.43h213.48v55.43h-81.26v309.12h106.13l-1.21-12.07c-1.23-12.32-.41-25.77,2.51-41.09l1.7-6.12c2.38-7.9,16.19-49.77,55.02-99.15l4.94-6.23c15.41-17.96,28.21-37.88,38.04-59.2,15.53-33.68,23.4-69.71,23.4-107.09,0-109.53-69.52-206.86-173-242.19Z" />
+              </symbol>
+            <use xlink:href="#triangle" width="91" height="165" />   
+            <g>
+            <line id="one" class="st2" x1="-15.3" y1="36.8" x2="-4.8" y2="47.4" />
+            <line id="two" class="st2" x1="-3.4" y1="16.6" x2="8.1" y2="32.7" />
+            <line id="three" class="st2" x1="21" y1="13.2" x2="24.5" y2="26.8" />
+            <line id="four" class="st2" x1="41.4" y1="5.5" x2="42.3" y2="24.9" />
+            <line id="five" class="st2" x1="61.9" y1="14.2" x2="57.8" y2="27.9" />
+            <line id="six" class="st2" x1="88.2" y1="19.4" x2="74.5" y2="34" />
+            <line id="seven" class="st2" x1="98.7" y1="40" x2="86.2" y2="48.8" />
+                </g>
+            </svg>
+        </div>
+    </div>
+    <div id="main-wrapper">
+        <header class="topbar">
+            <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+                <div class="navbar-header">
+                    <!-- This is for the sidebar toggle which is visible on mobile only -->
+                    <a class="nav-toggler waves-effect waves-light d-block d-md-none"
+                       href="javascript:void(0)">
+                        <i class="ri-close-line fs-6 ri-menu-2-line"></i>
+                    </a>
+                    <!-- -------------------------------------------------------------- -->
+                    <!-- Logo -->
+                    <!-- -------------------------------------------------------------- -->
+                    <a class="navbar-brand" asp-area="Inventory" asp-action="Index" asp-controller="Home">
+                        <!-- Logo icon -->
+                        <b class="logo-icon">
+                            <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                            <!-- Dark Logo icon -->
+                            <img src="~/assets/images/inventory-icon.png" alt="Inventory" class="dark-logo" />
+                            <!-- Light Logo icon -->
+                            <img src="~/assets/images/logo-light-icon.png"
+                                 alt="homepage"
+                                 class="light-logo" />
+                        </b>
+                        <!--End Logo icon -->
+                        <!-- Logo text -->
+                        <span class="logo-text">
+                            <!-- dark Logo text -->
+                            <img src="~/assets/images/inventory.png" alt="Inventory" class="dark-logo ms-2" />
+                            <!-- Light Logo text -->
+                            <img src="~/assets/images/logo-light-text.png"
+                                 class="light-logo"
+                                 alt="homepage" />
+                        </span>
+                    </a>
+
+                    <a class="topbartoggler d-block d-md-none waves-effect waves-light"
+                       href="javascript:void(0)"
+                       data-bs-toggle="collapse"
+                       data-bs-target="#navbarSupportedContent"
+                       aria-controls="navbarSupportedContent"
+                       aria-expanded="false"
+                       aria-label="Toggle navigation">
+                        <i class="ri-more-line fs-6"></i>
+                    </a>
+                </div>
+                <!-- -------------------------------------------------------------- -->
+                <!-- End Logo -->
+                <!-- -------------------------------------------------------------- -->
+                <div class="navbar-collapse collapse" id="navbarSupportedContent">
+                    <!-- -------------------------------------------------------------- -->
+                    <!-- toggle and nav items -->
+                    <!-- -------------------------------------------------------------- -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item d-none d-md-block">
+                            <a class="nav-link sidebartoggler waves-effect waves-light"
+                               href="javascript:void(0)"
+                               data-sidebartype="mini-sidebar">
+                                <i data-feather="menu" class="feather-sm"></i>
+                            </a>
+                        </li>
+
+
+
+                    </ul>
+                    <!-- -------------------------------------------------------------- -->
+                    <!-- Right side toggle and nav items -->
+                    <!-- -------------------------------------------------------------- -->
+                    <ul class="navbar-nav w-30 justify-content-between">
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- Switch Application -->
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="navbarDropdown"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                <span class="d-none d-md-block">
+                                    Inventory <i data-feather="chevron-down" class="feather-sm"></i>
+                                </span>
+                                <span class="d-block d-md-none">
+                                    <i data-feather="plus" class="feather-sm"></i>
+                                </span>
+                            </a>
+                            @if ((AuthorizationService.AuthorizeAsync(User, Permissions.Dashboard.PBJSnapView)).Result.Succeeded)
+                            {
+                                <div class="dropdown-menu dropdown-menu-end user-dd animated flipInY pb-0"
+                                     aria-labelledby="navbarDropdown"
+                                     style="min-width: auto;">
+                                    <span class="with-arrow"></span>
+                                    <div class="d-flex flex-column no-block align-items-start p-3 text-white mb-0">
+                                        @if ((AuthorizationService.AuthorizeAsync(User, Permissions.Dashboard.PBJSnapView)).Result.Succeeded)
+                                        {
+                                            <a class="dropdown-item " asp-area=""
+                                               asp-controller="Home" asp-action="Index">PBJSnap </a>
+                                        }
+                                        @if ((AuthorizationService.AuthorizeAsync(User, Permissions.Dashboard.InventoryView)).Result.Succeeded)
+                                        {
+                                            <a class="dropdown-item" href="#">Labor File Mover</a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </li>
+
+                        <li>
+                            <div>
+                                <span class="d-none d-md-block" style="color:white;">
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <div class="ms-2" style="margin-top: 15px;">
+                                            <h6 class="mb-0">@user.FirstName @user.LastName</h6>
+                                        </div>
+                                    }
+                                    <div class="ms-2">
+                                        @if (!userRoles.Count.Equals(0))
+                                        {
+                                            @foreach (var role in userRoles)
+                                            {
+                                                var roleDetails = await RoleManager.FindByIdAsync(role.RoleId);
+                                                if (@roleDetails.Name == "SuperAdmin")
+                                                {
+                                                    <h6 class="mb-0">@roleDetails.Name</h6>
+                                                }
+                                                else
+                                                {
+                                                    if (@roleDetails.ApplicationId == "2")
+                                                    {
+                                                        <h6 class="mb-0">@roleDetails.Name</h6>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <h6 class="mb-0">Please contact your admin to assign role</h6>
+                                        }
+                                    </div>
+                                </span>
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            @*<a class="nav-link dropdown-toggle waves-effect waves-dark"
+                            href=""
+                            data-bs-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                            <i data-feather="bell" class="feather-sm"></i>
+                            </a>*@
+                            <div class="dropdown-menu dropdown-menu-end mailbox dropdown-menu-animate-up">
+                                <span class="with-arrow"><span class="bg-primary"></span></span>
+                                <ul class="list-style-none">
+                                    <li>
+                                        <div class="drop-title bg-primary text-white">
+                                            <h4 class="mb-0 mt-1">4 New</h4>
+                                            <span class="fw-light">Notifications</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="message-center notifications">
+                                            <!-- Message -->
+                                            <a href="#" class="message-item">
+                                                <span class="btn btn-light-danger text-danger btn-circle">
+                                                    <i data-feather="link" class="feather-sm fill-white"></i>
+                                                </span>
+                                                <div class="mail-contnet">
+                                                    <h5 class="message-title">Luanch Admin</h5>
+                                                    <span class="mail-desc">Just see the my new admin!</span>
+                                                    <span class="time">9:30 AM</span>
+                                                </div>
+                                            </a>
+                                            <!-- Message -->
+                                            <a href="#" class="message-item">
+                                                <span class="btn btn-light-success text-success btn-circle">
+                                                    <i data-feather="calendar" class="feather-sm fill-white"></i>
+                                                </span>
+                                                <div class="mail-contnet">
+                                                    <h5 class="message-title">Event today</h5>
+                                                    <span class="mail-desc">Just a reminder that you have event</span>
+                                                    <span class="time">9:10 AM</span>
+                                                </div>
+                                            </a>
+                                            <!-- Message -->
+                                            <a href="#" class="message-item">
+                                                <span class="btn btn-light-info text-info btn-circle">
+                                                    <i data-feather="settings" class="feather-sm fill-white"></i>
+                                                </span>
+                                                <div class="mail-contnet">
+                                                    <h5 class="message-title">Settings</h5>
+                                                    <span class="mail-desc">You can customize this template as you want</span>
+                                                    <span class="time">9:08 AM</span>
+                                                </div>
+                                            </a>
+                                            <!-- Message -->
+                                            <a href="#" class="message-item">
+                                                <span class="btn btn-light-primary text-primary btn-circle">
+                                                    <i data-feather="users" class="feather-sm fill-white"></i>
+                                                </span>
+                                                <div class="mail-contnet">
+                                                    <h5 class="message-title">Pavan kumar</h5>
+                                                    <span class="mail-desc">Just see the my admin!</span>
+                                                    <span class="time">9:02 AM</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-center mb-1 text-dark" href="#">
+                                            <strong>Check all notifications</strong>
+                                            <i data-feather="chevron-right" class="feather-sm"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- End Comment -->
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- Messages -->
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- End Messages -->
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- User profile and search -->
+                        <!-- -------------------------------------------------------------- -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic"
+                               href=""
+                               data-bs-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                <img src="~/assets/images/users/1.jpg"
+                                     alt="user"
+                                     class="rounded-circle"
+                                     width="31" />
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end user-dd animated flipInY">
+                                <span class="with-arrow"><span class="bg-primary"></span></span>
+                                <div class="d-flex no-block align-items-center p-3 bg-primary text-white mb-2">
+                                    <div class="">
+                                        <img src="~/assets/images/users/1.jpg"
+                                             alt="user"
+                                             class="rounded-circle"
+                                             width="60" />
+                                    </div>
+
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <div class="ms-2">
+                                            <h4 class="mb-0">@user.FirstName @user.LastName</h4>
+                                            <p class="mb-0">@user.Email</p>
+                                            @if (user.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                            {
+                                                <p class="mb-0">ThinkAnew</p>
+                                            }
+                                            else
+                                            {
+                                                <p class="mb-0">@userOrganizationName</p>
+                                            }
+                                            @if (!userRoles.Count.Equals(0))
+                                            {
+                                                @foreach (var role in userRoles)
+                                                {
+                                                    var roleDetails = await RoleManager.FindByIdAsync(role.RoleId);
+                                                    if (@roleDetails.Name == "SuperAdmin")
+                                                    {
+                                                        <p class="mb-0">@roleDetails.Name</p>
+                                                    }
+                                                    else
+                                                    {
+
+                                                        if (@roleDetails.ApplicationId == "2")
+                                                        {
+                                                            <p class="mb-0">@roleDetails.Name</p>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <p class="mb-0">Please contact your admin to assign role</p>
+                                            }
+                                        </div>
+                                    }
+
+
+                                </div>
+                                <a class="dropdown-item" href="@Url.Action("MyProfile", "User", new {Area="TANUserManagement"})">
+                                    <i data-feather="user" class="feather-sm text-info me-1 ms-1"></i> My
+                                    Profile
+                                </a>
+                                <a href="/Identity/Account/UserChangePassword" class="dropdown-item">
+                                    <i class="mdi mdi-account-convert feather-sm text-info me-1 ms-1"></i>
+                                    Change Password
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <div class="pl-4 p-2">
+                                    <a href="/Identity/Account/Login" class="btn d-block w-100 btn-primary rounded-pill">Logout</a>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- -------------------------------------------------------------- -->
+                        <!-- User profile and search -->
+                        <!-- -------------------------------------------------------------- -->
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- -------------------------------------------------------------- -->
+        <!-- End Topbar header -->
+        <!-- -------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------- -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- -------------------------------------------------------------- -->
+        <aside class="left-sidebar">
+            <!-- Sidebar scroll-->
+            <div class="scroll-sidebar">
+                <!-- Sidebar navigation-->
+                <nav class="sidebar-nav">
+                    <ul id="sidebarnav" class="mt-4">
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                               asp-area="" asp-controller="Home" asp-action="ErrorPage"
+                               aria-expanded="false">
+                                <i data-feather="archive" class="feather-icon"></i><span class="hide-menu">Products</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                               asp-area="" asp-controller="Home" asp-action="ErrorPage"
+                               aria-expanded="false">
+                                <i data-feather="grid" class="feather-icon"></i><span class="hide-menu">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link has-arrow waves-effect waves-dark"
+                               href="#"
+                               aria-expanded="false">
+                                <i data-feather="package" class="feather-icon"></i><span class="hide-menu">Inventory </span>
+                            </a>
+                            <ul aria-expanded="false" class="collapse first-level">
+                                <li class="sidebar-item">
+                                    <a asp-area="" asp-controller="Home" asp-action="ErrorPage" class="sidebar-link">
+                                        <i data-feather="trending-up"></i><span class="hide-menu"> Stock Management </span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a asp-area="" asp-controller="Home" asp-action="ErrorPage" class="sidebar-link">
+                                        <i class="ri-home-3-line"></i><span class="hide-menu"> Rental Management </span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a asp-area="" asp-controller="Home" asp-action="ErrorPage" class="sidebar-link">
+                                        <i class="ri-tools-fill"></i><span class="hide-menu"> Defect Management </span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                               asp-area="" asp-controller="Home" asp-action="ErrorPage"
+                               aria-expanded="false">
+                                <i data-feather="message-circle" class="feather-icon"></i><span class="hide-menu">History</span>
+                            </a>
+                        </li>
+
+
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link has-arrow waves-effect waves-dark"
+                               href="#"
+                               aria-expanded="false">
+                                <i data-feather="settings" class="feather-icon"></i><span class="hide-menu">Configuration </span>
+                            </a>
+                            <ul aria-expanded="false" class="collapse first-level">
+                                @if ((AuthorizationService.AuthorizeAsync(User, Permissions.UserManagement.InventoryView)).Result.Succeeded)
+                                {
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" asp-area="TanUserManagement" asp-controller="User" asp-action="UserList">
+                                            <i class="ri-user-settings-line"></i>
+
+                                            <span class="hide-menu"> User Management </span>
+
+                                        </a>
+                                    </li>
+                                }
+                                @if ((AuthorizationService.AuthorizeAsync(User, Permissions.RoleManagement.InventoryView)).Result.Succeeded)
+                                {
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" asp-area="TANUserManagement" asp-controller="Roles" asp-action="Index"><i class="ri-user-line"></i><span class="hide-menu"> Role Management </span></a>
+                                    </li>
+                                }
+                                @if ((AuthorizationService.AuthorizeAsync(User, Permissions.Organization.InventoryView)).Result.Succeeded)
+                                {
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" asp-area="" asp-controller="Organization" asp-action="Index">
+                                            <i class="ri-building-2-line"></i><span class="hide-menu"> Organizations </span>
+                                        </a>
+                                    </li>
+                                }
+                                @if ((AuthorizationService.AuthorizeAsync(User, Permissions.Facility.InventoryView)).Result.Succeeded)
+                                {
+                                    <li class="sidebar-item">
+                                    <a class="sidebar-link" asp-area="" asp-controller="Facility" asp-action="Index">
+                                        <i class="ri-settings-line"></i><span class="hide-menu"> Facilities </span>
+                                    </a>
+                                </li>
+                                }
+                            </ul>
+                        </li>
+
+
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                               asp-area="" asp-controller="Home" asp-action="ErrorPage"
+                               aria-expanded="false">
+                                <i data-feather="shopping-bag" class="feather-icon"></i><span class="hide-menu">Stores</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                               asp-area="" asp-controller="Home" asp-action="ErrorPage"
+                               aria-expanded="false">
+                                <i data-feather="truck" class="feather-icon"></i><span class="hide-menu"> Shipments</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                               asp-area="" asp-controller="Home" asp-action="ErrorPage"
+                               aria-expanded="false">
+                                <i data-feather="help-circle" class="feather-icon"></i><span class="hide-menu"> Help</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+
+                <!-- End Sidebar navigation -->
+            </div>
+            <!-- End Sidebar scroll-->
+            <div class="d-flex justify-content-center align-items-end logo-footer-wrapper w-100 bg-white hide-menu">
+                <span>Powered by</span>
+                <div class="db logo-sidebar-footer">
+                    <img src="../../assets/images/logo1.png" alt="logo" />
+                </div>
+            </div>
+        </aside>
+        <!-- -------------------------------------------------------------- -->
+        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- -------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------- -->
+        <!-- Page wrapper  -->
+        <div class="page-wrapper">
+        @RenderBody()
+
+            <footer class="footer bg-white">
+                <div class="d-flex align-items-center justify-content-between footer-sm">
+                    <div>
+                        © @DateTime.Now.ToString("yyyy") -
+                        <a href="#">Think Anew, LLC. All Rights Reserved</a>.
+                    </div>
+                    <div>@description</div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Required Js files -->
+
+    <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="~/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Theme Required Js -->
+    <script src="~/dist/js/app.min.js"></script>
+    <script src="~/dist/js/app.init.js"></script>
+    <script src="~/dist/js/app-style-switcher.js"></script>
+    <!-- perfect scrollbar JavaScript -->
+    <script src="~/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="~/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!--Wave Effects -->
+    <script src="~/dist/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="~/dist/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="~/dist/js/feather.min.js"></script>
+    <script src="~/dist/js/custom.min.js"></script>
+
+    <script src="~/assets/datatables.net-bs4/js/jquery.datatables.min.js"></script>
+    <script src="~/assets/datatables.net-bs4/js/datatables.bootstrap4.min.js"></script>
+    <script src="~/assets/datatables.net-bs4/js/datatables.responsive.min.js"></script>
+    <script src="~/sweetalert2/sweetalert2.min.js"></script>
+    <!-- --------------------------------------------------------------- -->
+    <!-- This page JavaScript -->
+    <!-- --------------------------------------------------------------- -->
+    <script src="~/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="~/dist/js/pages/dashboards/dashboard1.js"></script>
+
+    <script src="~/chosen/chosen.jquery.min.js"></script>
+    <script src="~/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <partial name="_Layoutscripts" />
+    @await RenderSectionAsync("Scripts",required:false)
+    @await RenderSectionAsync("pageScripts",required:false)
+
+    <script src="~/assets/libs/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/assets/libs/select2/dist/js/select2.min.js"></script>
+    <script src="~/dist/js/pages/forms/select2/select2.init.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var sessionTimeoutConfig = @Html.Raw(Json.Serialize(
+                new {
+                    warnAfter = int.Parse(config.GetSection("SessionTimeoutConfig:WarnAfter").Value),
+                    redirAfter = int.Parse(config.GetSection("SessionTimeoutConfig:RedirAfter").Value),
+                    ignoreUserActivity = bool.Parse(config.GetSection("SessionTimeoutConfig:IgnoreUserActivity").Value)
+                }
+            ));
+            window.sessionTimeoutConfig = sessionTimeoutConfig;
+
+            var SuccessmsgPop = '@(TempData["SuccessmsgPop"])';
+            if (SuccessmsgPop != '') { SuccessMsg('Success', SuccessmsgPop, ''); };
+            var WarningmsgPop = '@(TempData["WarningmsgPop"])';
+            if (WarningmsgPop != '') { WarningMsg('Warning', WarningmsgPop, ''); };
+            var ErrormsgPopup = '@(TempData["ErrormsgPopup"])';
+            if (ErrormsgPopup != '') { ErrorMsg('Error', ErrormsgPopup, ''); };
+
+            var sessionTimeoutConfig = @Html.Raw(Json.Serialize(
+                new {
+                warnAfter = int.Parse(config.GetSection("SessionTimeoutConfig:WarnAfter").Value),
+                redirAfter = int.Parse(config.GetSection("SessionTimeoutConfig:RedirAfter").Value),
+                ignoreUserActivity = bool.Parse(config.GetSection("SessionTimeoutConfig:IgnoreUserActivity").Value)
+                }
+                ));
+            window.sessionTimeoutConfig = sessionTimeoutConfig;
+        });
+    </script>
+    <script src="~/assets/extra-libs/jquery-sessiontimeout/jquery.sessionTimeout.min.js"></script>
+    <script src="~/Scripts/SessionOut.js"></script>
+</body>
+</html>

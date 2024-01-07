@@ -1,0 +1,27 @@
+﻿@using TANWeb.Helpers;
+@model IEnumerable< TAN.DomainModels.ViewModels.TileViewModel>
+
+<div class="row">
+     @foreach(var tile in Model)
+        {
+        <div class="col-sm-12 col-md-4 col-lg-4 d-flex align-items-stretch">
+        <div class="card card-hover w-100">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 d-flex align-items-center">
+                        <div>
+                            <span>@tile.TileText</span>
+                            <h4 class="mb-0">@tile.TileValue</h4>
+                        </div>
+                    </div>
+                    <div class="col-6 d-flex justify-content-end">
+                            <div class="round align-self-center @tile.TileSubText">
+                                <i class="@tile.TileArrowText feather feather-sm fs-5"></i>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+</div>

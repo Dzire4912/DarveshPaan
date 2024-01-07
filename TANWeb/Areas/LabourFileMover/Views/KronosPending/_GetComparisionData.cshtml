@@ -1,0 +1,136 @@
+﻿@model IEnumerable<TAN.DomainModels.ViewModels.KronosComarisionVM>
+@{
+    int i = 0;
+}
+
+
+
+<div class="container">
+    <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table display table-bordered table-striped no-wrap" id="compreTable">
+                <thead>
+                    <tr>
+                       
+                        <th scope="col">SI No</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Employee Id</th>
+                        <th scope="col">Facility</th>
+                        <th scope="col">Work Day</th>
+                        <th scope="col">Job Type</th>
+                        <th scope="col">Pay type</th>
+                        <th scope="col">Total Hours</th>                       
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="kronos-pending-rows">
+                        <th> Kronos </th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    @foreach (var item in Model.ToList())
+                    {
+                        @if (item.Source == "TimeSheet")
+                        {
+                            if (i == 0)
+                            {
+                                <tr class="kronos-pending-rows">
+                                    <th>TimeSheet</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+
+                            }
+                            i++;
+                        }
+                        <tr>
+
+                            <td>
+                                <input type="hidden" value="@item.Id" />
+                                <input class="form-check-input checkbox-row selected" type="checkbox" />
+                            </td>
+                            <td>
+                                @item.Source
+                            </td>
+                            <td>
+                                @item.EmployeeId
+                            </td>
+                            <td>
+                                @item.FacilityName
+                                            <input type="hidden" value="@item.facilityId" />
+                            </td>
+                            <td>
+                                @item.WorkDay.ToString("MM-dd-yyyy")
+                            </td>
+                            <td>
+                                @item.JobType
+                                            <input type="hidden" value="@item.JobTypeCode" />
+                            </td>
+                            <td>
+                                @item.PayType
+                                            <input type="hidden" value="@item.PayTypeCode" />
+                            </td>
+                            <td>
+                                @item.Hours
+                            </td>
+                          
+
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+
+        </div>
+        <div class="col-sm-12">
+            <div class="d-flex justify-content-end mt-2 pt-1">
+                <button type="button" onclick="updatecomp()" id="compsave" class="btn waves-effect waves-light btn-info">
+                    <i class="fa fa-check"></i>
+                    Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable after the document is ready
+        //compreTable
+        console.log("Initializing DataTable...");
+        $('#compreTable').DataTable({
+            order: [],
+            pagingType: "full_numbers",
+            language: {
+                paginate: {
+                    first: '<i class="fa fa-angle-double-left"></i>',
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>',
+                    last: '<i class="fa fa-angle-double-right"></i>',
+                }
+            },
+            columnDefs: [
+                { orderable: false, targets: [0,1,2,3,4,5,6,7] }
+            ]
+        });
+    });
+</script>
+
+
+
+

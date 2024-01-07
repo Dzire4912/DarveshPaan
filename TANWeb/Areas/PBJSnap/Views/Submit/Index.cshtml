@@ -1,0 +1,113 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.SubmitModel
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Submit</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Submit</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion pb-3" id="accordionExample">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="ri-filter-line pe-1"></i> Submit Information
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+
+                        <div class="accordion-body bg-white" id="filterDiv">
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="alert bg-light mb-3 py-2 filter-info text-dark border">
+                                        <div class="row">
+                                            <div class="col-md-11  px-2">
+                                                Please select the facility, year and quarter of the report you want to download. And Generate your Payroll Based Journal file.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gy-3 custom-select-arrow">
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Facility <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="FacilityId" class="form-select select2 sm-3" aria-label="Default select example" onchange="retrun getAgencies()">
+                                            @foreach (var item in Model.FacilityList)
+                                            {
+                                                <option value="@item.Id">@item.FacilityName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Year <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select class="form-select sm-3" aria-label="Default select example" id="YearList">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Quarter <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="QuarterList" class="form-select sm-3" aria-label="Default select example" onchange="getMonthList()">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Month</label>
+                                        <div class="clearfix"></div>
+                                        <select class="form-select sm-3" aria-label="Default select example" id="MonthList">
+                                            <option selected>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                @if ((AuthorizationService.AuthorizeAsync(User,
+                                Permissions.Submit.PBJSnapGenerate)).Result.Succeeded)
+                                {
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" onclick="GenerateSubmitData()" fdprocessedid="8hkutvc">Generate</button>
+                                        </div>
+                                    </div>
+                                } 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/scripts/Submit.js"></script>
+    <script>
+
+    </script>
+}

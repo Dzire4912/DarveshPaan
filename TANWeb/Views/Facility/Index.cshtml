@@ -1,0 +1,235 @@
+﻿@using Microsoft.AspNetCore.Authorization;
+@model TAN.DomainModels.ViewModels.FacilityViewModel
+@inject IAuthorizationService AuthorizationService
+@using TAN.DomainModels.Helpers;
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Facility</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        @if (@ViewBag.isFromOrganization == "true")
+                        {
+                            <li class="breadcrumb-item"><a href="/Organization">Organizations</a></li>
+                        }
+                        <li class="breadcrumb-item active" aria-current="page">Facilities</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-7 align-self-center">
+            <div class="d-flex no-block justify-content-end align-items-center">
+                @if ((AuthorizationService.AuthorizeAsync(User,
+                Permissions.Facility.PBJSnapCreate)).Result.Succeeded)
+                {
+                    <button type="button" id="btnAddFacility" class="btn waves-effect waves-light btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#FacilityModal">
+                        <i class="ri-add-fill me-1 align-bottom"></i> New Facility
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <div class="row gy-3 custom-select-arrow">
+                                    @if (Model.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                    {
+                                        <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 col-sm-12">
+                                            <div class="overlap-input-field">
+                                                <label for="placeholderInput" class="form-label">Organization Name</label>
+                                                <div class="clearfix"></div>
+                                                <select id="facilityOrgName" class="select2" asp-items="@(new SelectList(Model.OrganizationList, "Text", "Text"))">
+                                                    <option>Select Organization Name</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
+                                        <div class="overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Application Name</label>
+                                            <div class="clearfix"></div>
+                                            <select id="facilityAppName" class="select2" asp-items="@(new SelectList(Model.ApplicationList, "Text", "Text"))">
+                                                <option>Select Application Name</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" fdprocessedid="8hkutvc"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center" fdprocessedid="j8azn"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12">
+            <div class="card rounded-0">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table display table-bordered table-striped no-wrap w-100" id="facilityTable">
+                            <thead>
+                                <tr>
+                                    <th>Facility Id</th>
+                                    <th>Facility Name</th>
+                                    <th>Organization Name</th>
+                                    <th>Application Names</th>
+                                    <th>State</th>
+                                    <th>Location Id</th>
+                                    <th>Actions</th>
+                                    <th>Add User</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="FacilityModal" tabindex="-1" aria-labelledby="FacilityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="FacilityModalLabel">Add Facility</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <partial name="~/Views/Facility/_FacilityForm.cshtml" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_CommonScriptsPartial" />
+        <script src="~/scripts/Facility.js"></script>
+        <script type="text/javascript">
+            var myData = '@ViewBag.buttonId';
+            var fromOrganization = '@ViewBag.isFromOrganization';
+            $(document).ready(function () {
+                $('#FacilityModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                loadFacilityData();
+                initSelect2ForFacility();
+                $('#facilityState').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#facilityOrganizationName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#facilityApplicationName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+
+                if (myData) {
+                    loadModalPopUp();
+                }
+                if (fromOrganization !== "true") {
+                    clearFilter();
+                    $('#facilityTable').dataTable().fnDestroy();
+                    loadFacilityData();
+                }
+                document.addEventListener('click', handleClick);
+            });
+
+            $('#btnSaveFacility').click(function (e) {
+                if (validateFacilityForm()) {
+                    if (checkDeduction()) {
+                        saveFacility();
+                        e.preventDefault();
+                    }
+                    if (!checkDeduction()) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            $('#btnUpdateFacility').click(function (e) {
+                if (validateFacilityForm()) {
+                    updateFacility();
+                }
+            });
+
+            $('#btnClose').click(function (e) {
+                clearFacilityData();
+            });
+
+            $('#btnAddFacility').click(function (e) {
+                clearFacilityData();
+            });
+
+            $('#btnClear').click(function (e) {
+                clearFilter();
+                $('#facilityTable').dataTable().fnDestroy();
+                loadFacilityData();
+            });
+
+            $('#btnSearch').click(function (e) {
+                let orgName = $('#facilityOrgName').val();
+                let appName = $('#facilityAppName').val();
+                clearFilter();
+                $('#facilityOrgName').val(orgName).trigger('change');
+                $('#facilityAppName').val(appName).trigger('change');
+                $('#facilityTable').dataTable().fnDestroy();
+                loadFacilityData();
+            });
+        </script>
+    }
+}

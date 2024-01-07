@@ -1,0 +1,118 @@
+﻿@using Microsoft.AspNetCore.Authorization;
+@inject IAuthorizationService AuthorizationService
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+        ViewData["Title"] = "Storage";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+        ViewData["Title"] = "Storage";
+    }
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Storage</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Storage</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+
+
+    <div class="container-fluid pt-2">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item border-0">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="ri-filter-line pe-1"></i> Upload File to Cloud
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body bg-white" id="filterDiv">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="placeholderInput" class="form-label">Upload File <span class="text-danger">*</span></label>
+                                        @* <div class="col-lg-4 mt-0"> *@
+                                        <input type="file" id="fileUpload" class="fileUpload" />
+                                        @* </div> *@
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="file" class="control-label">
+                                            <a href="#" class="info" data-plugin-tooltip="tooltip" data-toggle="tooltip" data-placement="top" title="CSV, XLS, XLXS, and XML file formats are supported">
+                                                <i class="fa fa-question-circle"></i>
+                                            </a>
+                                        </label>
+                                        <div class="clearfix"></div>
+                                        <label class="control-label">Upload from OneDrive </label>&nbsp;
+                                        <input type="checkbox" id="onedrive" value="1" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12">
+                    <div class="card rounded-0">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table display table-bordered table-striped no-wrap w-100" id="storageTable">
+                                    <thead>
+                                        <tr>
+                                            <th data-column-name="File Name">File Name</th>
+                                            <th data-column-name="Size">Size</th>
+                                            <th data-column-name="Action">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <script src="~/scripts/Storage.js"></script>
+        <script src="~/Scripts/fileuploadinput.js"></script>
+        <script src="https://js.live.net/v7.0/OneDrive.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                loadStorageData();
+                // Get a reference to the checkbox element by its ID
+                let checkbox = document.getElementById("onedrive");
+
+                // Add a click event listener to the checkbox
+                checkbox.addEventListener("click", function () {
+                    // Check if the checkbox is checked
+                    if (checkbox.checked) {
+                        processOneDriveInStorage();
+                    }
+                });
+            });
+            $('#btnUploadFile').click(function (e) {
+                uploadFile();
+            });
+
+        </script>
+    }
+    }

@@ -1,0 +1,205 @@
+﻿@page
+@model TANWeb.Areas.Identity.Pages.Account.EmailPhoneConfirmationModel
+@{
+    ViewData["Title"] = "Confirm Email and Phone Number";
+}
+
+
+<div class="row auth-wrapper gx-0">
+    <div class="col-lg-6 col-xl-6 bg-info auth-box-2 on-sidebar leftbar-info">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="row justify-content-center text-center">
+
+                <div class="col-md-5 col-lg-10 col-xl-9 px-lg-0 mt-3">
+                    <div class="left-image m-auto img-left-screens">
+                        <img src="../../assets/images/email-conf.png" class="p-2" alt="logo" />
+                    </div>
+                     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-xl-6 d-flex align-items-center justify-content-center">
+        <div class="row justify-content-center w-75 mt-lg-0">
+            <div class="col-lg-7 col-xl-7 col-md-7">
+                <div class="card" id="loginform">
+                    <div class="card-body">
+                        <div class="col-lg-12">
+                            <div class="d-flex justify-content-center align-items-center mb-5">
+                                <div class="db logo-footer">
+                                    <img src="../../assets/images/logo1.png" alt="logo" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="logo text-center">
+                            <h3>Confirm Email</h3>
+                            <p class="text-muted fs-4">
+                                Enter the otp sent to your mail to confirm your email id.
+                            </p>
+                        </div>
+                        <div class="pt-2">
+                            <form id="account" method="post">
+                                <div class="form-floating mb-3">
+                                    <input type="hidden" asp-for="Input.Email" id="HdnEmailId" />
+                                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                                    @if (!Convert.ToBoolean(ViewData["EmailConfirmed"]?.ToString()))
+                                    {
+                                        <input asp-for="Input.EmailOTP" id="EmailOTP" type="hidden" />
+                                        <div id="otp" class="inputs d-flex flex-row justify-content-center mt-2">
+                                            <input class="m-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="first" maxlength="1" autocomplete="off" />
+                                            <input class="m-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="second" maxlength="1" autocomplete="off" />
+                                            <input class="m-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="third" maxlength="1" autocomplete="off" />
+                                            <input class="m-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="fourth" maxlength="1" autocomplete="off" />
+                                            <input class="m-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="fifth" maxlength="1" autocomplete="off" />
+                                            <input class="m-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="sixth" maxlength="1" autocomplete="off" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-light-secondary">
+                                            Confirmed
+                                        </div>
+                                    }
+                                  
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="ms-auto">
+                                        <a href="#" id="ResendOTP" class="fw-bold">Resend OTP</a>
+                                        <h5 id="CountDown" style="display:none"></h5>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-stretch button-group mt-4">
+                                    <button type="submit" class="btn btn-info btn-lg px-4 w-100" onclick="Validate()">Confirm</button>
+                                </div>
+
+                            </form>
+                            <div class="d-flex align-items-stretch  mt-4">
+                                <a asp-page="./Login">
+                                    <i class="ri-arrow-left-fill mr-2"></i>Back to login
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $(".AllowNumbers").on("keydown", function (event) {
+                // Allow only numeric digits (0-9) and some special keys like Backspace, Delete, Arrow keys, etc.
+                var allowedKeys = [8, 9, 17, 37, 39, 46, 86]; // Add more key codes if needed
+
+                // Check if the pressed key is not in the allowed keys list and is not a numeric digit
+                if (allowedKeys.indexOf(event.keyCode) === -1 && !(event.key >= "0" && event.key <= "9")) {
+                    event.preventDefault(); // Prevent the key press
+                }
+            });
+        });
+        function Validate() {
+            var emailOtp = '';
+            $("#account input[type=text]")
+                .each(function () {
+                    if ($(this).val().trim() == '') {
+                        return false;
+                    }
+                    emailOtp += $(this).val().trim();
+                });
+
+            $('#EmailOTP').val(emailOtp);
+        }
+
+        $('.moveFocus').on('input', function (event) {
+            event.preventDefault();
+            var inputLength = $(this).val().length;
+            if (inputLength === 1) {
+                if ($(this).index() < 5) {
+                    $(this).next('.moveFocus').focus();
+                } else {
+                    $(this).blur();
+                }
+            }
+        });
+        $('.AllowNumbers').on('input', function (event) {
+            var inputValue = $(this).val().replace(/[^0-9]/g, '');
+
+            if (inputValue.length === 6) {
+                var otpArray = inputValue.split('');
+
+                $('.moveFocus').each(function (index) {
+                    if (index < 6) {
+                        $(this).val(otpArray[index]);
+                    }
+                });
+            }
+        });
+
+        $('.AllowNumbers').on('paste', function (event) {
+            var inputElement = this;
+
+            navigator.clipboard.readText()
+                .then(function (pastedText) {
+                    if (pastedText && pastedText.match(/^\d+$/)) {
+                        var otpArray = pastedText.split('');
+
+                        if (otpArray.length === 6) {
+                            $('.moveFocus').each(function (index) {
+                                if (index < 6) {
+                                    $(this).val(otpArray[index]);
+                                }
+                            });
+                        }
+                    } else {
+                        inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Failed to read clipboard data:', error);
+                });
+        });
+
+        $("#ResendOTP").on("click", function () {
+            $("#ResendOTP").css("display", "none");
+            $("#CountDown").css("display", "block");
+            startTimer();
+            $.ajax({
+                type: 'GET',
+                url: '/Identity/Account/ResendOTPEmailConfirmed?Email=' + $('#HdnEmailId').val().trim(),
+                success: function (response) {
+                   
+                },
+                error: function (err) {
+                    onTimesUp();
+                    $("#CountDown").css("display", "none");
+                    $("#ResendOTP").css("display", "block");
+                    console.log('err otp ' + err);
+                }
+            })
+        });
+
+        let timerInterval = null;
+        function onTimesUp() {
+            clearInterval(timerInterval);
+        }
+
+        function startTimer() {
+            var counter = 60;
+            timerInterval = setInterval(() => {
+                counter--;
+                if (counter == 0) {
+                    onTimesUp();
+                    $('#CountDown').text("");
+                    $("#CountDown").css("display", "none");
+                    $("#ResendOTP").css("display", "block");
+                } else {
+                    $('#CountDown').text(counter + " secs");
+                }
+            }, 1000);
+        }
+
+    </script>
+}

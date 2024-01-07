@@ -1,0 +1,87 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.CensusViewModel
+<div class="py-2 border-bottom title-part-padding d-flex justify-content-between align-items-center">
+    <div class="d-flex flex-column">
+        <h4 class="card-title mb-0">Census</h4>
+        <h6>A list of census data for the selected facility.</h6>
+    </div>
+
+    <div class="d-flex">
+        @if ((AuthorizationService.AuthorizeAsync(User,
+        Permissions.Review.PBJSnapAddCensus)).Result.Succeeded)
+        {
+            <button type="button" data-bs-toggle="modal" data-bs-target="#CencusModal" onclick="openCencusModal()" class="btn waves-effect waves-light btn-info me-2 d-flex btn-sm"> <i class="ri-add-line pe-1"></i> Add</button>
+        }
+
+        <button type="button" class="btn waves-effect waves-light btn-info d-flex btn-sm" onclick="return DownloadCencusCSV()"> <i class="ri-upload-line pe-1"></i> Export</button>
+
+    </div>
+</div>
+<div class="card-body">
+    <div class="table-responsive m-t-40">
+        <table id="CencusTable" class="table display table-bordered table-striped no-wrap mb-0 w-100">
+            <thead>
+                <tr>
+                    <th>FacilityName</th>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Medicare</th>
+                    <th>Medicad</th>
+                    <th>Other</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="CencusModal" tabindex="-1" aria-labelledby="CencusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="CensusModalLabel">Add Census</h5>
+                <button type="button" class="btn-close CencusClose" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="CensunFormInReview" method="post" asp-antiforgery="true">
+                    <input type="hidden" class="form-control" id="CensusId" />
+                    <div class="col-lg-12 custom-select-arrow">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Month<span class="text-danger">*</span></label>
+                            <select class="form-select" id="CencusMonthList"></select>
+                            <span class="text-danger errormsg" title="Month" id="CencusMonthListError"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Medicare<span class="text-danger">*</span></label>
+                            <input type="number" id="RMedicare" class="form-control AllowNumbers CencusfieldRequired maxInputNumberLength" />
+                            <span class="text-danger errormsg" title="Medicare" id="RMedicareError"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Medicad<span class="text-danger">*</span></label>
+                            <input type="number" id="RMedicad" class="form-control AllowNumbers CencusfieldRequired maxInputNumberLength" />
+                            <span class="text-danger errormsg" title="Medicad" id="RMedicadError"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Other<span class="text-danger">*</span></label>
+                            <input type="number" id="ROther" class="form-control AllowNumbers CencusfieldRequired maxInputNumberLength" />
+                            <span class="text-danger errormsg" title="Other" id="ROtherError"></span>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer py-0 pe-0">
+                        <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveFunction()" style="display:none" id="btnUpdateCencus">Update</button>
+                        <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveFunction()" id="SaveCencus">Save</button>
+                        <button type="button" class="btn btn-secondary m-0 ms-2" id="btnClose" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,190 @@
+﻿@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Entities.EditUserViewModel
+
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+        ViewData["Title"] = "Edit User";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+        ViewData["Title"] = "Edit User";
+    }
+}
+
+
+    <div class="page-breadcrumb pt-2">
+        <div class="row">
+            <div class="col-5 align-self-center">
+                <h4 class="card-title mb-0">Edit User</h4>
+                <div class="d-flex align-items-center">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                            <li class="breadcrumb-item active"><a asp-controller="Users" asp-action="Index">@ViewData["Title"]</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid main-content-height pt-0">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="UpdateUser" id="EditUser">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+                    <div class="row">
+                        <div>
+                            <input type="hidden" id="userId" value="@Model.users.Id" name="userId" />
+                        </div>
+                        @*    <div class="col-lg-6">
+                        <div>
+                        <label for="firstName" class="form-label">User Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" asp-for="@Model.users.UserName " id="edtxtUser" name="userName" placeholder="Enter username">
+                        </div>
+                        </div>*@
+                        <div class="col-lg-6 mb-2">
+                            <div>
+                                <label for="lastName" class="form-label">First Name<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" asp-for="@Model.users.FirstName " onchange="ClearSpan()" id="edtxtfName" name="Fname" placeholder="Enter first name" onkeydown="restrictInput(event)">
+                                <span id="spedtxtfName" class="text-danger validation"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-2">
+                            <div>
+                                <label for="lastName" class="form-label">Last Name<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" asp-for="@Model.users.LastName " onchange="ClearSpan()" id="edtxtlName" name="Lname" placeholder="Enter last name" onkeydown="restrictInput(event)">
+                                <span id="spedtxtlName" class="text-danger validation"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+
+                        <div class="col-lg-6 mb-2">
+                            <div>
+                                <label for="emailInput" class="form-label">Email<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" asp-for="@Model.users.Email" id="txtEmail" name="email" disabled>
+                                <span id="sptxtEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                    <div class="col-lg-6 mb-2 custom-select-arrow">
+                            <div class="overlap-input-field">
+                                <label for="emailInput" class="form-label">User Type<span class="text-danger">*</span></label>
+                                <select class="select2" asp-for="@Model.users.UserType" id="userType" name="userType" disabled>
+                                    @foreach (var option in Model.UserTypeList)
+                                    {
+                                        <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                    }
+                                </select>
+                                <span id="spuserType" class="text-danger validation"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                <div class="row custom-select-arrow">
+                        @if (ViewBag.userType != Convert.ToInt32(UserTypes.Thinkanew))
+                        {
+                            <div class="col-lg-6 mb-2">
+
+                                <div class="form-group overlap-input-field user-list-chip-fix">
+                                    <label for="emailInput" class="control-label form-label">Organization<span class="text-danger">*</span></label>
+                                    <select class="select2" multiple id="edOrg" name="orgList" disabled>
+                                        @foreach (var option in Model.OrgList)
+                                        {
+                                            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                        }
+                                    </select>
+                                    <span id="spUserType" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6 mb-2">
+
+                                <div class="form-group overlap-input-field user-list-chip-fix">
+                                    <label for="emailInput" class="control-label form-label">Facilities<span class="text-danger">*</span></label>
+                                    <select class="select2" multiple id="facility" name="facilities[]" onchange="GetEditFacilityApplication()" disabled>
+                                        @foreach (var option in Model.FacilityList)
+                                        {
+                                            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                        }
+                                    </select>
+                                    <span id="spapplication" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+                <div class="row custom-select-arrow">
+                        <div class="col-lg-6">
+                            <div class="overlap-input-field">
+                                <label for="emailInput" class="form-label">Default Application<span class="text-danger">*</span></label>
+                                <select class="select2" asp-for="@Model.users.DefaultAppId" id="defApp" name="defaultApp" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                                </select>
+                                <span id="spdefaultApplication" class="text-danger validation"></span>
+                            </div>
+                        </div>
+                </div>
+                    <div class="col-12">
+                        <div class="d-md-flex align-items-center mt-3">
+                            @if (!ViewBag.editingAnotherUser)
+                            {
+                                <div class="form-check">
+                                    <label for="emailInput" class="form-label">Enable 2FA</label>
+                                    <input asp-for="@Model.users.TwoFactorEnabled" type="checkbox" name="twofa" class="form-check-input" />
+                                    <span id="spdefaultApplication" class="text-danger validation"></span>
+                                </div>
+                            }
+                            <div class="ms-auto mt-3 mt-md-0">
+                                <button type="submit" class="btn waves-effect waves-light btn-info" onclick="CheckEdit(event)">
+                                    <div class="d-flex align-items-center">
+                                        Save
+                                    </div>
+                                </button>
+                                @*  <button class="btn waves-effect waves-dark cancel-btn"asp-action="UserList" asp-controller="User" asp-area="TANUserManagement">
+                                    <div class="d-flex align-items-center cancel-btn">
+                                        Cancel
+                                    </div>
+                                </button> *@
+                            <a href="@Url.Action("UserList", "User", new { area = "TANUserManagement" })" class="btn waves-effect waves-dark cancel-btn">
+                                <div class="d-flex align-items-center cancel-btn">
+                                    Cancel
+                                </div>
+                            </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+@section PageScripts {
+    @{
+        <partial name="_ValidationScriptsPartial"></partial>
+        <script>
+            $(document).ready(function () {
+                $('#defApp').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#facility').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+             })
+        </script>
+    }
+
+     }
+

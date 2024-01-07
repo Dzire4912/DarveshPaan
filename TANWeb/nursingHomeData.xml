@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nursingHomeData>
+	<header fileSpecVersion="4.00.0">
+		<facilityId>IronMan3</facilityId>
+		<stateCode>AR</stateCode>
+		<reportQuarter>2</reportQuarter>
+		<federalFiscalYear>2023</federalFiscalYear>
+		<softwareVendorName>Think Anew</softwareVendorName>
+		<softwareVendorEmail>sales@pbjsnap.com</softwareVendorEmail>
+		<softwareProductName>PBJSNAP</softwareProductName>
+		<softwareProductVersion>1.4.2</softwareProductVersion>
+	</header>
+	<employees>
+		<employee>
+			<employeeId>Emp005</employeeId>
+		</employee>
+	</employees>
+	<staffingHours processType="merge">
+		<staffHours>
+			<employeeId>Emp005</employeeId>
+			<workDays>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+				<workDay>
+					<date>6/20/2023 12:00:00 AM</date>
+					<hourEntries>
+						<hourEntry>
+							<hours>6</hours>
+							<jobTitleCode>7</jobTitleCode>
+							<payTypeCode>1</payTypeCode>
+						</hourEntry>
+					</hourEntries>
+				</workDay>
+			</workDays>
+		</staffHours>
+	</staffingHours>
+</nursingHomeData>

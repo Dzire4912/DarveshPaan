@@ -1,0 +1,583 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.ReviewModel
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Review</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Review</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion pb-3" id="accordionExample">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="ri-filter-line pe-1"></i> Report Information
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body bg-white" id="filterDiv">
+                            <div class="row gy-3 custom-select-arrow">
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 overlap-input-field">
+                                    <div>
+                                        <input type="hidden" value="@Model.FacilityId" id="hdnFacilityId" />
+                                        <label for="placeholderInput" class="form-label">Facility<span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="FacilityId" class="form-select sm-3 select2" aria-label="Default select example" onchange="getAgencies()">
+                                            @foreach (var item in Model.FacilityList)
+                                            {
+                                                if (item.Id == Convert.ToInt32(Model.FacilityId))
+                                                {
+                                                    <option value="@item.Id" selected>@item.FacilityName</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.Id">@item.FacilityName</option>
+                                                }
+
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Agencies</label>
+                                        <div class="clearfix"></div>
+                                        <select id="AgenciesId" class="form-select sm-3 select2" aria-label="Default select example">
+                                            <option value="" selected>Select Agency</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Year <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select class="form-select sm-3" aria-label="Default select example" id="YearList">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Quarter <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="QuarterList" class="form-select sm-3" aria-label="Default select example" onchange="getMonthList()">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Month</label>
+                                        <div class="clearfix"></div>
+                                        <select class="form-select sm-3" aria-label="Default select example" id="MonthList">
+                                            <option selected>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Upload Type <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="UploadType" class="form-select sm-3" aria-label="Default select example">
+                                            <option value="0" selected>Select</option>
+                                            <option value="1">Staff</option>
+                                            <option value="2">Hours</option>
+                                            <option value="3">Staff and Hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" onclick="FilterChange()" fdprocessedid="8hkutvc">Apply Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header py-2 bg-white border-bottom">
+                    <h4 class="card-title mb-0">Validation & Approve Status</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            @if ((AuthorizationService.AuthorizeAsync(User,
+                            Permissions.Review.PBJSnapValidate)).Result.Succeeded)
+                            {
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" onclick="return validateData();">Validate</button>
+                                    <a id="lnk_view_validated" href="#" data-bs-toggle="modal" data-bs-target="#myModal" onclick="return ViewValidatedList();">
+                                        View History
+                                    </a>
+                                </div>
+                            }
+                            <br />
+                            <div id="validateDiv">
+                                <h5><strong>Report validation status</strong></h5>
+                                <p id="validationUserFullName" />
+                                <p id="validationValidationDate" />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            @if ((AuthorizationService.AuthorizeAsync(User,
+                            Permissions.Review.PBJSnapApprove)).Result.Succeeded)
+                            {
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" onclick="return approveData()">Approve</button>
+                                    <a id="lnk_view_approved" href="#" data-bs-toggle="modal" data-bs-target="#myModal" onclick="return ViewApprovedList();">
+                                        View History
+                                    </a>
+                                </div>
+                            }
+                            <br />
+                            <div id="approvedDiv">
+                                <h5><strong>Report approval status</strong></h5>
+                                <p id="approvedUserFullName" />
+                                <p id="approvedDate" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Show validation error*@
+    @*<div class="row">*@
+    @*<div class="col-xl-12">*@
+    @*<div class="card">*@
+    @*<div class="card-header py-2 bg-white border-bottom">
+    <h4 class="card-title mb-0">Validation's Errors</h4>
+    </div>*@
+    @*<div class="card-body">*@
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="accordion accordion-flush pb-3" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2 collapsed" type="button" id="ValidationErrorAccordian" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            Validation's Errors
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-white">
+
+                            <div class="row">
+                                <div class="col-lg-12 d-flex align-items-end validation-history-sm justify-content-between">
+                                    <div class="col-xxl-3 col-lg-4 overlap-input-field">
+                                        <input type="hidden" value="@Model.FileId" id="hdnFileId" />
+                                        <div class="d-flex align-items-center custom-select-arrow">
+                                            <label for="placeholderInput" class="form-label text-nowrap mb-0">File Name <span class="text-danger">*</span> :</label>
+                                            <select id="FileNameList" class="form-select sm-3 ms-2" aria-label="Default select example">
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-2 col-xl-4 col-md-6 ">
+                                        <div class="d-flex gap-2 flex-wrap ms-2">
+                                            <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info ms-2" onclick="return validationErrorsList()" fdprocessedid="8hkutvc">Search</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-xl-4 col-md-6 d-flex justify-content-end align-items-center ms-2 validation-pagination-sm">
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span id="pageCountId"></span>
+                                        </div>
+                                        <div class="d-flex align-items-center ms-3">
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                <span id="rowCountId"></span>
+                                            </div>
+                                            <div class="d-flex gap-2 flex-wrap ms-2">
+                                                <select id="PageSizeddl" class="form-select sm-3" aria-label="Default select example">
+                                                    <option value="10">10</option>
+                                                    <option value="20">20</option>
+                                                    <option value="50">50</option>
+                                                    <option value="100">100</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-12 mt-3 hide" id="fileDetailsLabel">
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span>
+                                            <b>Facility :</b> <span id="FacilityNameLabel"></span>
+                                        </span>
+                                        <span>
+                                            <b>CreateDate :</b> <span id="CreateDateLabel"></span>
+                                        </span>
+                                        <span>
+                                            <b>Uploaded By :</b> <span id="UploadedByLabel"></span>
+                                        </span>
+                                        <span>
+                                            <b>Year :</b> <span id="YearByLabel"></span>
+                                        </span>
+                                        <span class="me-3">
+                                            <b>Quarter :</b> <span id="ReportQuarterLabel"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="dataTableContainer" class="mt-3 table-responsive bg-white validation-history-table">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    @*</div>*@
+    @*</div>*@
+    @*</div>*@
+    @*</div>*@
+
+    @* end validation error*@
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header py-2 bg-white border-bottom">
+                    <h4 class="card-title mb-0">Missing dates</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card border shadow-sm mb-0">
+
+                                <div class="card-body d-sm-flex d-md-flex d-lg-block justify-content-md-between justify-content-sm-between align-items-md-center align-items-sm-center ">
+                                    <h5 class="card-title">Registered Nurse:</h5>
+                                    <button type="button" class="btn waves-effect waves-light btn-info me-2" id="btnAddReview" data-bs-toggle="modal" onclick="openNurseGenerateCalenderModalPopup('7')"> <i class="ri-calendar-line me-1 align-bottom"></i> Calendar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card border shadow-sm mb-0">
+
+                                <div class="card-body d-sm-flex d-md-flex d-lg-block justify-content-md-between justify-content-sm-between align-items-md-center align-items-sm-center ">
+                                    <h5 class="card-title">Licensed Practical Nurse:</h5>
+                                    <button type="button" class="btn waves-effect waves-light btn-info me-2" id="btnAddReview" data-bs-toggle="modal" onclick="openNurseGenerateCalenderModalPopup('8')"> <i class="ri-calendar-line me-1 align-bottom"></i> Calendar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card border shadow-sm mb-0">
+                                <div class="card-body d-sm-flex d-md-flex d-lg-block justify-content-md-between justify-content-sm-between align-items-md-center align-items-sm-center ">
+                                    <h5 class="card-title">Certified Nurse Assistant:</h5>
+                                    <button type="button" class="btn waves-effect waves-light btn-info me-2" id="btnAddReview" data-bs-toggle="modal" onclick="openNurseGenerateCalenderModalPopup('10')"> <i class="ri-calendar-line me-1 align-bottom"></i> Calendar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        @Html.Partial("EmployeeList", Model.EmployeeDetailModel)
+    </div>
+
+    <div class="card" id="StaffingDepartmentList">
+        @Html.Partial("StaffingDepartmentDetails",Model.StaffingDepartment)
+    </div>
+
+    <div class="card" id="CencusDataList">
+        @Html.Partial("Census",Model.CensusModel)
+    </div>
+</div>
+
+<div class="modal fade" id="ReviewModal" tabindex="-1" aria-labelledby="ReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="ReviewModalLabel">Calendar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body pt-0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="card-body calender-sidebar">
+                                            <div id="calender"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- BEGIN MODAL -->
+        <div class="modal none-border" id="my-event">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header d-flex align-items-center">
+                        <h4 class="modal-title"><strong>Add/Update Working Hours and Job Type</strong></h4>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary waves-effect"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-success save-event waves-effect waves-light">
+                            Create event
+                        </button>
+                        <button type="button"
+                                class="btn btn-danger delete-event waves-effect waves-light"
+                                data-bs-dismiss="modal">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop bckdrop hide"></div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="AddNurseWorkingHours" tabindex="-1" aria-labelledby="AddNurseWorkingHoursLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="AddNurseWorkingHoursLabel">Add Working details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6 custom-select-arrow">
+                        <div id="NurseEmployeeIdDiv" class="form-group mb-3">
+                            <label class="control-label">Employee Id <span class="text-danger">*</span></label>
+                            <select id="NurseEmployeeId" class="select2 sm-3">
+                            </select>
+                            <span class="text-danger errormsg" title="Employee Id" id="NurseEmployeeIdError"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group mb-3">
+                            <label class="control-label">Hours Worked <span class="text-danger">*</span></label>
+                            <input type="number" id="NurseHoursWorked" class="form-control  " step="0.1" />
+                            <span class="text-danger errormsg" title="Hours Worked" id="NurseHoursWorkedError"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group mb-3">
+                        <input type="checkbox" class="form-check-input" value="1" onchange="SwitchToConsecutiveDate()" id="SwitchNurseConsecutiveDateToBasicDate" /> <span>Switch to Consecutive Days</span>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group mb-3" style="display:none" id="NurseDateRangeDiv">
+                        <label class="control-label">Work Day <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="NurseDateRange" name="daterange" value="@DateTime.Now - @DateTime.Now" />
+                        <span class="text-danger errormsg" title="Work Day" id="NurseDateRangeError"></span>
+                    </div>
+                </div>
+                <div class="col-lg-12 mb-3" id="NurseWorkDayDiv">
+                    <div class="form-group d-flex align-items-end">
+                        <div class="d-flex flex-column w-100">
+                            <label class="control-label">Work Day <span class="text-danger">*</span></label>
+                            <input type="date" id="NurseWorkDay" class="form-control  " max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+
+                        <a class="btn btn-primary ms-2 text-nowrap" onclick="addNurseNonConsecutiveDatesFunction()">Add Date</a>
+
+                    </div>
+                    <span class="text-danger errormsg" title="Work Day" id="NurseWorkDayError"></span>
+                </div>
+                <div class="col-md-12 mb-3 date-lists-section" id="divNurseDateList" style="cursor:pointer">
+                    <span id="NurseSelectedDateList" class="mb-0 badge font-medium bg-light-primary text-primary"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 custom-select-arrow">
+                        <div id="NurseWorkingPayTypeDiv" class="form-group mb-3">
+                            <label class="control-label">Pay Type <span class="text-danger">*</span></label>
+                            <select id="NurseWorkingPayType" class="select2 sm-3">
+                            </select>
+                            <span class="text-danger errormsg" title="Pay Type" id="NurseWorkingPayTypeError"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 custom-select-arrow">
+                        <div id="NurseWorkingJobTitleDiv" class="form-group">
+                            <label class="control-label">Job Title <span class="text-danger">*</span></label>
+                            <select id="NurseWorkingJobTitle" class="select2 sm-3">
+                            </select>
+                            <span class="text-danger errormsg" title="Job Title" id="NurseWorkingJobTitleError"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pe-0 pt-0">
+                <button type="submit" class="btn waves-effect waves-light btn-info" onclick="return SaveNurseMissingWorkingHoursDates()">Save</button>
+                <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ValidationErrorModalData" tabindex="-1" aria-labelledby="ValidationErrorModalDataLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="AddNurseWorkingHoursLabel">Validation Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-primary " type="button" data-bs-toggle="collapse" data-bs-target="#collapseTopWorkdayListTab" aria-expanded="false" aria-controls="collapseExample">
+                                Work Day List
+                            </button>
+                        </div>
+                       
+                        <div class="collapse" id="collapseTopWorkdayListTab">
+                            <div class="card card-body">
+                                <div id="TopWorkdayListTab" class="row">
+                                    <table class="table display table-bordered table-striped no-wrap mb-0 w-100">
+                                        <thead>
+                                            <tr>
+                                                <th>Employee Id</th>
+                                                <th>Full Name</th>
+                                                <th>Work Day</th>
+                                                <th>Pay Code</th>
+                                                <th>Job Type</th>
+                                                <th>Hours</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="TopWorkdayListTabTableBody">
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="5" align="right"><strong>Total Hours</strong></td>
+                                                <td>
+                                                    <span id="lblTotalWorkingHours"></span>
+                                                    <input type="hidden" id="hdnTotalWorkingHours" value="0" />
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="RightErrorTab" class="row"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pt-0">
+                <button type="submit" class="btn waves-effect waves-light btn-info" onclick="return UpdateErrorRowData()">Validate</button>
+                <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ViewHistoryModalPop *@
+<div class="modal fade" id="ViewReportVerificationModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog validation-history-modal modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2 ">
+                <h5 class="modal-title" id="myModalLabel">View History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+             @*    <div class="card">
+                    <div class="card-body"> *@
+                        <div class="table-responsive m-t-5">
+                            <table id="historyDataTable" class="table display table-bordered table-striped no-wrap mb-0 w-100 zoomed-table">
+                                <thead>
+                                    <tr>
+                                        <th class="id-th"></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="jobTitileColumn">
+                                </tbody>
+                            </table>
+                        </div>
+                   @*  </div>
+                </div> *@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_CommonScriptsPartial" />
+    <script src="~/scripts/Review.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Check if ViewBag.FacilityId is not null
+            // Check if ViewBag.FacilityId is not null
+            var facilityIdFromViewBag = @Html.Raw(Json.Serialize(ViewBag.FacilityId));
+            if (facilityIdFromViewBag !== null) {
+                autoselect(facilityIdFromViewBag);
+                // Select the option with the value from ViewBag.FacilityId
+
+            }
+        });
+    </script>
+}
+

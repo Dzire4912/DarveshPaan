@@ -1,0 +1,32 @@
+﻿@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+<div class="container-fluid main-content-height">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="mt-5">
+                <h1 class="mb-1">Welcome to </h1>
+                <h1 class="text-info mb-3">Telecom Reporting</h1>
+                <p class="mb-4 text-dark h4 fw-light">
+                    Hi Dev, This is Telecome Reporting Application
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="~/assets/images/reporting.jpg" alt="Telecom Reporting" class="img-responsive" />
+        </div>
+    </div>
+
+</div>

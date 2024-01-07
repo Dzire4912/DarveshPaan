@@ -1,0 +1,266 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@using TAN.DomainModels.Helpers
+@using Microsoft.AspNetCore.Identity;
+@model TAN.DomainModels.ViewModels.RolesViewModel;
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+
+<div class="page-breadcrumb pt-2">
+        <div class="row">
+            <div class="col-6 align-self-center">
+                <h4 class="page-title">@ViewData["Title"]</h4>
+                <div class="d-flex align-items-center">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                            <li class="breadcrumb-item active"><a asp-controller="Roles" asp-action="Index">@ViewData["Title"]</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-6 align-self-center">
+                <div class="d-flex no-block justify-content-end align-items-center">
+                    @if ((AuthorizationService.AuthorizeAsync(User, Permissions.RoleManagement.PBJSnapCreate)).Result.Succeeded)
+                    {
+                        <button class="btn waves-effect waves-light btn-secondary addMembers-modal" data-bs-toggle="modal" data-bs-target="#addmemberModal"><i class="ri-add-fill me-1 align-bottom"></i> Add Role</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="container-fluid main-content-height pt-0">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseOne"
+                                    aria-expanded="false"
+                                    aria-controls="flush-collapseOne">
+                                <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filters</span>
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne"
+                             class="accordion-collapse collapse"
+                             aria-labelledby="flush-headingOne"
+                             data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body bg-light">
+                                <div class="live-preview">
+                                <div class="row g-3 align-items-end custom-select-arrow">
+                                        <div class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">User Type</label>
+                                            <select class="form-select select2" onchange="getuserTypeRoles()" id="userTypes" asp-items="@(new SelectList(Model.UserTypesItems, "Value", "Text"))">
+                                                <option value="" selected>Select User Type</option>
+                                            </select>
+                                        </div>
+                                        <div id="appNameFilter" class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Applications</label>
+                                            <select class="form-select select2" onchange="getappRole()" id="appName" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                                                <option value="" selected>Select Application</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Role</label>
+                                            <select class="form-select select2" id="roleName" asp-items="@(new SelectList(Model.AppRoleList, "Value", "Text"))">
+                                                <option value="" selected>Select Role</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-6 col-md-12 col-lg-4 col-xl-2 me-3 btn-width">
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button type="button" onclick="searchRole()" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                                <div class="d-flex gap-1 flex-wrap">
+                                                    <button type="button" onclick="resetRoleFilter()" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="RoleList" class="table display table-bordered table-striped no-wrap">
+                                <thead>
+                                    <tr>
+                                        <th class="border-bottom border-top" scope="col">Role</th>
+                                        <th class="border-bottom border-top" scope="col">ApplicationName </th>
+                                        <th class="border-bottom border-top" scope="col">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var role in Model.RolesList)
+                                    {
+
+                                        <tr>
+                                            <td class="roleName">
+                                                @role.RoleName
+                                            </td>
+                                            <td>
+                                                @role.ApplicationName
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (role.RoleName != "SuperAdmin")
+                                                    {
+                                                        <a class="text-info me-4" title="Manage Permissions" data-bs-toggle='tooltip' data-bs-placement='top' asp-controller="Permission" asp-action="Index" asp-route-roleId="@role.RoleId"><i class="fas fa-wrench fs-4"></i></a>
+                                                    }
+                                                    @if ((AuthorizationService.AuthorizeAsync(User, Permissions.RoleManagement.PBJSnapEdit)).Result.Succeeded)
+                                                    {
+                                                        <span><a href="#" onclick="GetRole('@role.RoleId')" class="text-info fs-15 me-4" data-bs-toggle='tooltip' data-bs-placement='top' title='Edit'><i class="ri-edit-2-line fs-6"></i></a></span>
+                                                    }
+                                                    @if ((AuthorizationService.AuthorizeAsync(User, Permissions.RoleManagement.PBJSnapDelete)).Result.Succeeded)
+                                                    {
+                                                        <span><a href="#" onclick="DeleteRole('@role.RoleId')" class="link-danger fs-15" data-bs-toggle='tooltip' data-bs-placement='top' title='Delete'><i class="ri-delete-bin-line fs-6 text-danger"></i></a></span>
+                                                    }
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    }
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="addmemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h4 class="modal-title" id="myModalLabel">Add Role</h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close" onclick="clearForm()"></button>
+            </div>
+            <div class="text-danger ms-3 mt-2">
+            </div>
+            <div class="modal-body pt-0">
+                <form method="post" asp-action="AddRole" asp-antiforgery="true" asp-controller="roles" id="addroleform">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="pb-2 custom-select-arrow">
+                                <label asp-for="ApplicationName" class="control-label">Application <span class="text-danger">*</span></label>
+                                <select id="appNameSelect"  class="form-select" asp-for="@Model.ApplicationName" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                                    <option value="" selected>Select Application</option>
+                                </select>
+                                <span asp-validation-for="ApplicationName" class="text-danger errormsg"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label asp-for="RoleName" class="control-label">Role <span class="text-danger">*</span></label>
+                                <input id="roleNameSelect" type="text" class="form-control" asp-for="RoleName" placeholder="Enter Role" autocomplete="off" onblur="validateInputOnBlur(this)">
+                                <span asp-validation-for="RoleName" class="text-danger errormsg" id="roleName_Error"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer pt-0 py-0 pe-0">
+                        <button type="submit" class="btn waves-effect waves-light btn-info" id="addNewMember">Add Role</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearForm()">Close</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="updatememberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h4 class="modal-title" id="myModalLabel">Update Role</h4>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+
+            </div>
+            <div class="text-danger ms-3 mt-2">
+            </div>
+            <div class="modal-body pt-0">
+                <form>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div>
+                                <label class="form-label">Role <span class="text-danger">*</span></label>
+                                <input type="hidden" class="form-control" id="Edit_roleId">
+                                <input type="text" class="form-control" id="Edit_role" placeholder="Enter Role" onblur="validateInputOnBlurForUpdateRole(this)">
+                                <span id="error_Edit_role" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer pt-0">
+                <button type="button" onclick="EditRole()" class="btn waves-effect waves-light btn-info" id="updateRole">Update Role</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@section PageScripts {
+    <partial name="_ValidationScriptsPartial"></partial>
+    <script>
+        $(document).ready(function () {
+            $('#RoleList').dataTable().fnDestroy();
+            $('#RoleList').dataTable({
+                pagingType: "full_numbers",
+                language: {
+                    paginate: {
+                        first: '<i class="fa fa-angle-double-left"></i>',
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>',
+                        last: '<i class="fa fa-angle-double-right"></i>',
+                    }
+                },
+                columnDefs: [
+                    { "orderable": false, "targets": 2 }
+                ]
+            });
+        });
+    </script>
+}

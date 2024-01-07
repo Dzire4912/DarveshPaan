@@ -1,0 +1,94 @@
+﻿@model TAN.DomainModels.Models.BackoutModal
+
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Backout</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Backout</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="ri-filter-line pe-1"></i> Backout Information
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body bg-light" id="filterDiv">
+                            <div class="live-preview">
+                                <div class="row g-3 align-items-end custom-select-arrow">
+                                    <div class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Facility <span class="text-danger">*</span></label>
+                                        <select id="FacilityId" class="select2" aria-label="Default select example">
+                                            @foreach (var item in Model.FacilityList)
+                                            {
+                                                <option value="@item.Id">@item.FacilityName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Year <span class="text-danger">*</span></label>
+
+                                        <select id="YearList" class="form-select sm-3" aria-label="Default select example"></select>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Quarter <span class="text-danger">*</span></label>
+
+                                        <select id="QuarterList" class="form-select sm-3" aria-label="Default select example"></select>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Status <span class="text-danger">*</span></label>
+
+                                        <select id="StatusListId" class="form-select sm-3" aria-label="Default select example">
+                                            <option value="0">Select all</option>
+                                            <option value="1">Invalid Record(s)</option>
+                                            <option value="2">Valid Record(s)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-12 col-lg-4 col-xl-2 me-3 btn-width">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button class="btn waves-effect waves-light btn-info" onclick="getUploadFileDetails()"><i class="ri-equalizer-fill me-1 align-bottom"></i>Apply Filters</button>
+                                        </div> 
+                                    </div> 
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+
+        @Html.Partial("GetUploadFileDetails")
+    </div>
+</div>
+
+
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/scripts/Backout.js"></script>
+        <script>
+
+        </script>
+}

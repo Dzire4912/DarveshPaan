@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TANWeb</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TANWeb.styles.css" asp-append-version="true" />
+    <link href="~/css/ta-style.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/datatables.net-bs4/css/datatables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/assets/datatables.net-bs4/css/responsive.datatables.min.css" rel="stylesheet" />
+    <link href="~/chosen/chosen.css" rel="stylesheet" />
+    <link href="~/chosen/chosen.min.css" rel="stylesheet" />
+    <link href="~/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/assets/select2/css/select2.min.css" rel="stylesheet" />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+
+
+
+<body>
+    <div id="preloaderlight" class="d-none">
+        <div id="status">
+            <div class="spinner-border text-primary avatar-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div id="main-wrapper" role="main">
+        @RenderBody()
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/assets/datatables.net-bs4/js/jquery.datatables.min.js"></script>
+    <script src="~/assets/datatables.net-bs4/js/datatables.bootstrap4.min.js"></script>
+    <script src="~/assets/datatables.net-bs4/js/datatables.responsive.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/chosen/chosen.jquery.min.js"></script>
+    <script src="~/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/assets/select2/js/select2.min.js"></script>
+    <partial name="_Layoutscripts" />
+    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("PageScripts",required:false)
+
+
+
+    <script>
+
+        $(document).ready(function () {
+            $("button").click(function () {
+                $("button .spinner-border").removeClass("d-none");
+            })
+
+
+
+            const changeText = function (el, text, color) {
+                el.text(text).css('color', color);
+            };
+
+
+
+            $('.passw').keyup(function () {
+                let len = this.value.length;
+                const pswText = $('.form .progressBar-text');
+
+
+
+                if (len === 0) {
+                    $('.form .progressBar-item').each(function () {
+                        $(this).removeClass('active')
+                    });
+                    changeText(pswText, 'Password is blank');
+                } else if (len > 0 && len <= 4) {
+                    $('.form .progressBar-itemA').addClass('active');
+                    $('.form .progressBar-itemB').removeClass('active');
+                    $('.form .progressBar-itemC').removeClass('active');
+                    changeText(pswText, 'Too weak');
+                } else if (len > 4 && len <= 8) {
+                    $('.form .progressBar-itemB').addClass('active');
+                    $('.form .progressBar-itemC').removeClass('active');
+                    changeText(pswText, 'Could be stronger');
+                } else {
+                    $('.form .progressBar-item').each(function () {
+                        $(this).addClass('active');
+                    });
+                    changeText(pswText, 'Strong password');
+                }
+            });
+        })
+    </script>
+</body>
+</html>

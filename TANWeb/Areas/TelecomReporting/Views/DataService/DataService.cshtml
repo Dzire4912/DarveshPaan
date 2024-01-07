@@ -1,0 +1,117 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.AddDataService
+
+<form id="DataServiceForm" method="post" asp-antiforgery="true">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="dataSrviceId" value="0" />
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="DataServiceModalLabel">Add Data Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">FacilityId/LocationId<span class="text-danger">*</span></label>
+                            <div class="clearfix"></div>
+                            <select id="LocationFacilityId" class="select2">
+                                @foreach (var item in Model.facilityLocationAccesses)
+                                {
+                                    <option value="@item.FacilityID">@item.FacilityName - @item.LocationId</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Provider Name<span class="text-danger">*</span></label>
+                            <input type="text" id="ProviderName" class="form-control fieldRequired" onkeypress="allowAlphaNumericWithoutSpace(event)" />
+                            <span class="text-danger errormsg" title="Provider Name" id="ProviderNameError"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Account Number<span class="text-danger">*</span></label>
+                            <input type="text" id="AccountNumber" class="form-control fieldRequired " onkeypress="allowAlphaNumericWithoutSpace(event)" />
+                            <span class="text-danger errormsg" title="Account Number" id="AccountNumberError"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Services<span class="text-danger">*</span></label>
+                            <div class="clearfix"></div>
+                            <select class="select2" id="ServiceTypeId">
+                                <option>Select Services</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Local IP<span class="text-danger">*</span></label>
+                            <input type="text" id="LocalIP" class="form-control fieldRequired" />
+                            <span class="text-danger errormsg" title="Local IP" id="LocalIPError"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Support Number<span class="text-danger">*</span></label>
+                            <input type="text" id="SupportNumber" class="form-control fieldRequired maxInputNumberLength" />
+                            <span class="text-danger errormsg" title="Support Number" id="SupportNumberError"></span>
+                        </div>
+                    </div>
+                     
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Contract Document</label>
+                            <input type="file" id="ContractDocument" class="form-control  " />
+                            <a href='#' id="downloadContractDocxId" class="hide" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Contract Document"><i class='ri-file-download-fill text-info fs-6'></i> </a>
+                            <span class="text-danger errormsg" title="Contract Document" id="ContractDocumentError"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Contract End Date</label>
+                            <input type="date" id="ContractEndDate" class="form-control  " />
+                            <span class="text-danger errormsg" title="Contract End Date" id="ContractEndDateError"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                            <label for="placeholderInput" class="form-label">Contract Status</label>
+                            <div class="clearfix"></div>
+                            <select id="ContractStatus" class="select2">
+                                <option value="true">true</option>
+                                <option selected value="false">false</option>
+                            </select>
+
+                            <span class="text-danger errormsg" title="Contract Status" id="ContractStatusError"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-0 pe-0 pb-0">
+                <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveDataServiceFunction()" id="SaveDataService">Save</button>
+                <button type="button" class="btn waves-effect waves-light btn-info m-0 hide" onclick="return saveDataServiceFunction()" id="UpdateDataService">Update</button>
+                <button type="button" class="btn btn-secondary m-0 ms-2" id="btnClose" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+

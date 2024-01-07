@@ -1,0 +1,184 @@
+﻿@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.ViewModels.CostAnalysisViewModel
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Cost Analysis Report</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="~/Telecom/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Reports</li>
+                        <li class="breadcrumb-item active" aria-current="page">Voice Service</li>
+                        <li class="breadcrumb-item active" aria-current="page">Cost Analysis Report</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <div class="row g-3 mb-4 align-items-end custom-select-arrow">
+                                    @if (Model.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                    {
+                                        <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Organization Name</label>
+                                            <div class="clearfix"></div>
+                                            <select id="OrganizationNameFilter" class="select2">
+                                                <option value="0">Select Organization Name</option>
+                                                @foreach (var organization in Model.Organizations)
+                                                {
+                                                    <option value="@organization.Value">@organization.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    }
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Call Direction</label>
+                                        <div class="clearfix"></div>
+                                        <select id="CallDirectionFilter" class="select2">
+                                            <option value="0">Select Call Direction</option>
+                                            @foreach (var callDirection in Model.CallDirections)
+                                            {
+                                                <option value="@callDirection.Value">@callDirection.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Call Type</label>
+                                        <div class="clearfix"></div>
+                                        <select id="CallTypeFilter" class="select2">
+                                            <option value="0">Select Call Type</option>
+                                            @foreach (var callType in Model.CallTypes)
+                                            {
+                                                <option value="@callType.Value">@callType.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Call Result</label>
+                                        <div class="clearfix"></div>
+                                        <select id="CallResultFilter" class="select2">
+                                            <option value="0">Select Call Result Type</option>
+                                            @foreach (var callResult in Model.CallResults)
+                                            {
+                                                <option value="@callResult.Value">@callResult.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    @* <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end"> *@
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" fdprocessedid="8hkutvc"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center" fdprocessedid="j8azn"> <i class="ri-refresh-line me-1"></i> Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="content" class="row">
+        <div class="col-lg-12">
+            <div class="d-flex">
+            </div>
+            <div class="card">
+                <div class="py-2 border-bottom title-part-padding d-flex justify-content-between align-items-center flex-wrap employee-title-width">
+                    <h4 class="card-title mb-0">Cost Analysis Report</h4>
+                    <div>
+                        <button type="button" class="btn waves-effect waves-light btn-info d-flex btn-sm" onclick="return downloadCostAnalysisReportCSV()"> <i class="ri-upload-line pe-1"></i> Export</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table display table-bordered table-striped no-wrap mb-0 w-100 cost-report-table" id="costSummaryTable">
+                            <thead>
+                                <tr>
+                                    <th class="subAccount-th">Organization Name</th>
+                                    <th>Start Time (UTC)</th>
+                                    <th>End Time (UTC)</th>
+                                    <th class="duration-th">Duration</th>
+                                    <th class="calling-number-th">Calling Number</th>
+                                    <th class="called-number-th">Called Number</th>
+                                    <th class="call-direction-th">Call Direction</th>
+                                    <th class="call-type-th">Call Type</th>
+                                    <th class="cost-th">Cost (USD) $</th>
+                                    <th class="call-result-th">Call Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <script src="~/scripts/telecom/CostAnalysisReport.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                loadCostAnalysisReportData();
+                initSelectTwoForCallAnalysisReport();
+            });
+
+            $('#btnClear').click(function (e) {
+                clearFilter();
+                $('#costSummaryTable').dataTable().fnDestroy();
+                loadCostAnalysisReportData();
+            });
+
+            $('#btnSearch').click(function (e) {
+                $('#costSummaryTable').dataTable().fnDestroy();
+                loadCostAnalysisReportData();
+            });
+
+        </script>
+    }
+}

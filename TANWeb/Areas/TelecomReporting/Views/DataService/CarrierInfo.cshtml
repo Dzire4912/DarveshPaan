@@ -1,0 +1,108 @@
+﻿@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Carrier Information</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Carrier Information</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-12 align-self-center">
+            <div class="d-flex no-block justify-content-end align-items-center">
+                <button type="button" id="btnAddCarrier" class="btn waves-effect waves-light btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#CarrrierInfoModal">
+                    <i class="ri-add-fill me-1 align-bottom"></i>Add New Carrier
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid main-content-height pt-0">
+    <div class="container-fluid pt-2">
+        <div class="row">
+            <div class="col-xl-12 px-0">
+                <div class="card rounded-0">
+                    <div class="py-2 border-bottom title-part-padding ">
+                        <h4 class="card-title mb-0">Carrier Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table display table-bordered table-striped no-wrap w-100 data-service-upload-file-table" id="carrierInfoTable">
+                                <thead>
+                                    <tr>
+                                        <th data-column-name="Carrier Name">Carrier Name</th>
+                                        <th data-column-name="Created Date">Created Date (UTC)</th>
+                                        <th data-column-name="Action">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="CarrrierInfoModal" tabindex="-1" aria-labelledby="CarrrierInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="CarrrierInfoModalLabel">Add Carrier Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearCarrierData()"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("_CarrierInfoForm")
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <script src="~/Scripts/Telecom/Carrier.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#CarrrierInfoModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                loadCarrierData();
+            });
+
+            $('#btnSaveCarrier').click(function (e) {
+                if (validateCarrierForm()) {
+                    saveCarrierInfo();
+                }
+            });
+
+            $('#btnUpdateCarrier').click(function (e) {
+                if (validateCarrierForm()) {
+                    updateCarrier();
+                }
+            });
+
+        </script>
+    }
+    }

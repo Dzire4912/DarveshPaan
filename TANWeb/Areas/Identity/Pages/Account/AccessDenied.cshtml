@@ -1,0 +1,37 @@
+﻿@page "/accessdenied"
+@model AccessDeniedModel
+@{
+    var mylayout = HttpContext.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+
+<header>
+</header>
+<body>
+    <div class="d-flex justify-content-center align-items-center" style="flex-direction:column; height: 90vh;">
+        <h1 class="text-danger">@ViewData["Title"]</h1>
+        <p class="text-danger">You do not have access to this resource.</p>
+    </div>
+
+</body>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial"></partial>
+        <script>
+        </script>
+    }
+
+     }
+

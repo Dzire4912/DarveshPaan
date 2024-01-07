@@ -1,0 +1,127 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Configurations>Debug;Release;QA;Staging;Production</Configurations>
+	</PropertyGroup>
+
+	<ItemGroup>
+
+		<None Include="Areas\PBJSnap\Views\Home\Index.cshtml" />
+
+		<None Include="Areas\PBJSnap\Views\KronosHome\Index.cshtml" />
+
+		<None Include="Areas\PBJSnap\Views\Test\Index.cshtml" />
+
+		<None Include="wwwroot\Scripts\General.js" />
+
+		<None Include="wwwroot\Scripts\Organization.js" />
+
+		<None Include="wwwroot\Scripts\Role.js" />
+
+		<None Include="wwwroot\Scripts\UserList.js" />
+	</ItemGroup>
+
+	<ItemGroup>
+
+		<PackageReference Include="AspNetCore.ReCaptcha" Version="1.7.0" />
+
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />		
+
+		<PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
+
+		<PackageReference Include="CsvHelper" Version="30.0.1" />
+		<PackageReference Include="EPPlus" Version="5.8.14" />
+		<PackageReference Include="ExcelDataReader" Version="3.6.0" />
+		<PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+		<PackageReference Include="iTextSharp" Version="5.5.13.3" />
+		<PackageReference Include="itextsharp.xmlworker" Version="5.5.13.3" />
+		<PackageReference Include="LumenWorksX.Framework.IO" Version="1.0.1" />
+
+
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.6" />
+    <PackageReference Include="PgpCore" Version="5.10.0" />
+    <PackageReference Include="RestSharp" Version="110.2.0" />
+    <PackageReference Include="SimpleFeedReader" Version="1.0.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.9" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TAN.ApplicationCore\TAN.ApplicationCore.csproj" />
+		<ProjectReference Include="..\TAN.DomainModels\TAN.DomainModels.csproj" />
+		<ProjectReference Include="..\TAN.Repository\TAN.Repository.csproj" />
+
+		<ProjectReference Include="..\TAN.DomainModels\TAN.DomainModels.csproj" />
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Resources\TANResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>TANResource.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\TANResource.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>TANResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Areas\Inventory\Data\" />
+		<Folder Include="Areas\LabourFileMover\Data\" />
+		<Folder Include="Areas\LabourFileMover\Models\" />
+		<Folder Include="Areas\PBJSnap\Data\" />
+		<Folder Include="Areas\PBJSnap\Models\" />
+		<Folder Include="Areas\TelecomReporting\Data\" />
+		<Folder Include="Areas\TelecomReporting\Models\" />
+	</ItemGroup>
+
+	
+<Choose>
+		<When Condition="'$(Configuration)' == 'Production'">
+			<ItemGroup>
+				<None Include="appsettings.Production.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+				<None Include="appsettings.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+				<Content Remove="appsettings.*.json;" />
+			</ItemGroup>
+		</When>
+		<When Condition="'$(Configuration)' == 'QA'">
+			<ItemGroup>
+				<None Include="appsettings.QA.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+				<None Include="appsettings.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+				<Content Remove="appsettings.*.json;" />
+			</ItemGroup>
+		</When>
+		<When Condition="'$(Configuration)' == 'Staging'">
+			<ItemGroup>
+				<None Include="appsettings.Staging.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+				<None Include="appsettings.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+				<Content Remove="appsettings.*.json;" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<None Include="appsettings.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+				<None Include="appsettings.Development.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
+
+
+	<ProjectExtensions><VisualStudio><UserProperties appsettings_1qa_1json__JsonSchema="https://json.schemastore.org/azure-iot-edge-deployment-template-4.0.json" /></VisualStudio></ProjectExtensions>
+</Project>

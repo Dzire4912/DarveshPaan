@@ -1,0 +1,12 @@
+[
+  {
+    "outputFileName": "wwwroot/Scripts/Minifiedjs/CustomJs.min.js",
+    "inputFiles": [
+      "wwwroot/Scripts/*.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  }
+]

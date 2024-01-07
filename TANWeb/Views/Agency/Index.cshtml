@@ -1,0 +1,206 @@
+﻿@model TAN.DomainModels.ViewModels.AgencyViewModel
+@using Microsoft.AspNetCore.Authorization;
+@inject IAuthorizationService AuthorizationService
+@using TAN.DomainModels.Helpers;
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Agencies</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Agencies</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-7 align-self-center">
+            @if ((AuthorizationService.AuthorizeAsync(User,
+            Permissions.Agency.PBJSnapCreate)).Result.Succeeded)
+            {
+                <div class="d-flex no-block justify-content-end align-items-center">
+                    <button type="button" id="btnAddAgency" class="btn waves-effect waves-light btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#AgencyModal">
+                        New Agency
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview mb-3">
+                                <div class="row g-3 mb-4 align-items-end custom-select-arrow">
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Facility Name</label>
+                                        <div class="clearfix"></div>
+                                        @* <select id="agencyfacilityNameFilter" class="select2" asp-items="@(new SelectList(Model.FacilityList, "Text", "Text"))"> *@
+                                        <select id="agencyfacilityNameFilter" class="select2" onchange="getAgencies()">
+                                            <option>Select Facility Name</option>
+                                            @foreach (var item in Model.FacilityList)
+                                            {
+                                                <option value="@item.FacilityName">@item.FacilityName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label">Agency Id</label>
+                                        <div class="clearfix"></div>
+                                        <select id="agencyIdFilter" class="select2" asp-items="@(new SelectList(Model.AgencyIdList, "Text", "Text"))">
+                                        @* <select id="agencyIdFilter" class="select2"> *@
+                                            <option>Select Agency Id</option>
+                                           @*  @foreach (var item in Model.AgencyIdList)
+                                            {
+                                                <option value="@item.Text">@item.Text</option>
+                                            } *@
+                                        </select>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" fdprocessedid="8hkutvc"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center" fdprocessedid="j8azn"> <i class="ri-refresh-line me-1"></i> Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12">
+            <div class="card rounded-0">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table display table-bordered table-striped no-wrap w-100" id="agencyTable">
+                            <thead>
+                                <tr>
+                                    <th>Agency Id</th>
+                                    <th>Agency Name</th>
+                                    <th>Facility Name</th>
+                                    <th>State</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add and Edit Form -->
+<div class="modal fade" id="AgencyModal" tabindex="-1" aria-labelledby="AgencyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="AgencyModalLabel">Add Agency</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <partial name="~/Views/Agency/_AgencyForm.cshtml" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_CommonScriptsPartial" />
+        <script src="~/scripts/agency.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#AgencyModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                loadAgenciesData();
+                initSelect2ForAgency();
+                $('#agencyState').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#agencyFacilityName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                document.addEventListener('click', handleClick);
+            });
+
+            $('#btnClose').click(function (e) {
+                clearAgencyData();
+                let table = $('#agencyTable').DataTable();
+                table.destroy();
+                loadAgenciesData();
+            });
+
+            $('#btnSaveAgency').click(function (e) {
+                if (validateAgencyForm()) {
+                    saveAgency();
+                }
+            });
+
+            $('#btnUpdateAgency').click(function (e) {
+                if (validateAgencyForm()) {
+                    updateAgency();
+                }
+            });
+
+            $('#btnAddAgency').click(function (e) {
+                clearAgencyData();
+            });
+
+            $('#btnClear').click(function (e) {
+                clearFilter();
+                $('#agencyTable').dataTable().fnDestroy();
+                loadAgenciesData();
+            });
+
+            $('#btnSearch').click(function (e) {
+                $('#agencyTable').dataTable().fnDestroy();
+                loadAgenciesData();
+            });
+        </script>
+    }
+    }

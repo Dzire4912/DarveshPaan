@@ -1,0 +1,213 @@
+﻿@model TAN.DomainModels.ViewModels.PermissionViewModel
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+        ViewData["Title"] = "Permission Management";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+        ViewData["Title"] = "Permission Management";
+    }
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="card-title mb-0 flex-grow-1">@ViewData["Title"]</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a asp-controller="Roles" asp-action="Index">Role Management</a></li>
+                        <li class="breadcrumb-item active"><a asp-controller="Roles" asp-action="Index" asp-route-roleId="@Model.RoleId">@ViewData["Title"]</a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="container-fluid main-content-height pt-0">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button id="filterButton" class="accordion-button collapsed fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body bg-light">
+                                <div class="live-preview">
+                                    <form method="post" asp-action="addrole" asp-controller="roles">
+                                    <div class="row gy-3 custom-select-arrow">
+                                            <div class="col-xxl-3 col-md-4">
+
+                                                <div class="overlap-input-field">
+                                                    <label for="placeholderInput" class="form-label">Applications</label>
+                                                    <select onchange="getRole()" id="drpAppList" class="form-select select2" asp-for="@Model.AppId">
+                                                        @foreach (var option in Model.AppList)
+                                                        {
+                                                            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="overlap-input-field">
+                                                    <label for="placeholderInput" class="form-label">Role</label>
+                                                    <select onchange="GetPermission()" id="drproleList" class="form-select select2" asp-for="@Model.RoleId" asp-items="@(new SelectList(Model.RoleList, "Value", "Text"))">
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="overlap-input-field">
+                                                    <label for="placeholderInput" class="form-label">Module</label>
+                                                    <select onchange="GetPermission()" id="drpModuleList" class="form-select select2" asp-for="@Model.ModuleId" asp-items="@(new SelectList(Model.ModuleList, "Value", "Text"))">
+                                                        <option value="0" selected>Select Module</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <form asp-controller="permission" method="post" asp-action="Update" class="d-inline" id="UpdatePermissionform">
+                            <input asp-for="@Model.RoleId" type="hidden" />
+                            <div class="table-responsive">
+                                <table class="table display table-bordered table-striped no-wrap" id="permissionTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">SI No</th>
+                                            <th scope="col">Permission</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.RoleClaims != null)
+                                        {
+                                            @for (int claimCount = 0; claimCount < Model.RoleClaims.Count(); claimCount++)
+                                            {
+                                                int sno = claimCount + 1;
+                                                <tr>
+                                                    <th scope="row"><a href="#" class="fw-medium">@sno.</a></th>
+                                                    <td>
+                                                        <input asp-for="@Model.RoleClaims[claimCount].Type" type="hidden" />
+                                                        <input asp-for="@Model.RoleClaims[claimCount].Value" type="hidden" />
+                                                        @Model.RoleClaims[claimCount].Value
+                                                    </td>
+                                                    <td>
+                                                        <input asp-for="@Model.RoleClaims[claimCount].Selected" class="form-check-input checkbox-row selected" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+
+
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="d-flex justify-content-end mt-2 pt-1 pb-3">
+                                    <button type="submit" id="save" class="btn waves-effect waves-light btn-info">
+                                        <i class="fa fa-check"></i>
+                                    Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section PageScripts {
+    <partial name="_ValidationScriptsPartial"></partial>
+    <script>
+        $(document).ready(function () {
+            $('#permissionTable').dataTable().fnDestroy();
+            $('#permissionTable').dataTable({
+                pagingType: "full_numbers",
+                language: {
+                    paginate: {
+                        first: '<i class="fa fa-angle-double-left"></i>',
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>',
+                        last: '<i class="fa fa-angle-double-right"></i>',
+                    },
+                    emptyTable: "No data available, kindly ensure the module is selected"
+                },
+                pageLength: 50,
+                columnDefs: [
+                    { orderable: false, targets: [2] }
+                ]
+            });
+
+                $('#filterButton').trigger('click');
+        });
+
+        function GetPermission() {
+
+            $('#RoleId').val($('#drproleList').val());
+
+            var reqParameter = {
+                ModuleId: $('#drpModuleList').val(),
+                roleId: $('#drproleList').val(),
+                AppId: $('#drpAppList').val()
+            }
+
+            $.ajax({
+                type: 'Post',
+                data: reqParameter,
+                async: false,
+                url: urls.Permission.GetPermission,
+                success: function (response) {
+                    //  $('#drpAppList').html($(response).find("#drpAppList").html());
+                    $('#drpModuleList').html($(response).find("#drpModuleList").html());
+                    $('#permissionTable').html($(response).find("#permissionTable").html());
+                    $('#permissionTable').dataTable().fnDestroy();
+                    $('#permissionTable').DataTable({
+                        pagingType: "full_numbers",
+                        language: {
+                            paginate: {
+                                first: '<i class="fa fa-angle-double-left"></i>',
+                                previous: '<i class="fa fa-angle-left"></i>',
+                                next: '<i class="fa fa-angle-right"></i>',
+                                last: '<i class="fa fa-angle-double-right"></i>',
+                            },
+                            emptyTable: "No data available, kindly ensure the module is selected"
+                        },
+                        pageLength: 50,
+                        columnDefs: [
+                            { orderable: false, targets: [2] }
+                        ]
+                    });
+
+                },
+                failure: function (response) {
+                    alert("Something went wrong!");
+                }
+            });
+        }
+
+    </script>
+
+
+
+}

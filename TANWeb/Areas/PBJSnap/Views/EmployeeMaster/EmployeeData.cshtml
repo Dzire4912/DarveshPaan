@@ -1,0 +1,100 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.EmployeePopupModel
+<form id="EmployeeDataForm" method="post" asp-antiforgery="true">
+<input type="hidden" class="form-control" id="EmployeeId" />
+<div class="col-lg-12">
+    <div class="row custom-select-arrow">
+        <div class="col-lg-6 col-sm-12">
+            <div id="FacilityNameIdDiv" class="form-group mb-3">
+                <label class="control-label">Facility Name<span class="text-danger">*</span></label>
+                <select id="FacilityNameId" class="select2 fieldRequired" aria-label="Default select example">
+                    @foreach (var item in Model.FacilityList)
+                    {
+                        <option value="@item.Id">@item.FacilityName</option>
+                    }
+                </select>
+                <span class="text-danger errormsg" title="Facility Name Id" id="FacilityNameIdError"></span>
+            </div>
+        </div>
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <label class="control-label">Employee Id<span class="text-danger">*</span></label>
+                <input type="text" id="Employee_Id" class="form-control fieldRequired" maxlength="30" onkeypress="allowAlphaNumericSpace(event)" />
+                <span class="text-danger errormsg" title="Employee Id" id="Employee_IdError"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <label class="control-label">First Name<span class="text-danger">*</span></label>
+                <input type="text" id="FirstName" class="form-control fieldRequired" onkeydown="restrictInput(event)" />
+                <span class="text-danger errormsg" title="First Name" id="FirstNameError"></span>
+            </div>
+        </div>
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <label class="control-label">Last Name<span class="text-danger">*</span></label>
+                <input type="text" id="LastName" class="form-control fieldRequired" onkeydown="restrictInput(event)" />
+                <span class="text-danger errormsg" title="Last Name" id="LastNameError"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <label class="control-label">Hire Date</label>
+                <input type="date" id="HireDate" class="form-control  " />
+                <span class="text-danger errormsg" title="Hire Date" id="HireDateError"></span>
+            </div>
+        </div>
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <label class="control-label">Termination Date</label>
+                <input type="date" id="TerminationDate" class="form-control  " />
+                <span class="text-danger errormsg" title="Termination Date" id="TerminationDateError"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <div id="PayTypeDiv" class="overlap-input-field custom-select-arrow">
+                    <label class="control-label">Pay Type <span class="text-danger">*</span></label>
+                    <select id="PayType" class="select2 fieldRequired">
+                        @foreach (var item in Model.PayType)
+                        {
+                            <option value="@item.PayTypeCode">@item.PayTypeDescription</option>
+                        }
+                    </select>
+                    <span class="text-danger errormsg" title="Pay Type" id="PayTypeError"></span>
+                </div>
+
+            </div>
+            </div>
+        <div class="col-lg-6 col-sm-12">
+            <div class="form-group mb-3">
+                <div id="JobTitleDiv" class="select2PayType custom-select-arrow">
+                    <label class="control-label">Job Title <span class="text-danger">*</span></label>
+                    <select id="JobTitle" class="select2 fieldRequired">
+                        @foreach (var item in Model.JobCode)
+                        {
+                            <option value="@item.Id">@item.Title</option>
+                        }
+                    </select>
+                    <span class="text-danger errormsg" title="Job Title" id="JobTitleError"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer py-0 pe-0 pb-0">
+    <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveEmployeeFunction()" id="SaveEmployee">Save</button>
+    <button type="button" class="btn waves-effect waves-light btn-info m-0" onclick="return saveEmployeeFunction()" id="UpdateEmployee">Update</button>
+    <button type="button" class="btn btn-secondary m-0 ms-2" id="btnClose" data-bs-dismiss="modal">Close</button>
+</div>
+</form>

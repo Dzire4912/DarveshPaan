@@ -1,0 +1,36 @@
+﻿@model TAN.DomainModels.ViewModels.DataServiceTypeViewModel
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header modal-colored-header bg-info text-white py-2">
+            <h5 class="modal-title" id="FacilityModalLabel">Add Data Service Type</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class ="col-lg-12 col-md-12 col-sm-12 " hidden>
+                    <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                        <input type="text" id="dataServiceTypeId" class="form-control" hidden />
+                    </div>
+                </div>
+
+
+                <div class="col-lg-12 col-md-12 col-sm-12 ">
+                    <div class="form-group mb-2 custom-select-arrow overlap-input-field">
+                        <label for="dataServiceTypeName" class="form-label">Service Type Name<span class="text-danger">*</span></label>
+                        <input type="text" id="serviceName" class="form-control" />
+                        <span class="text-danger errormsg" id="ServiceNameError"></span>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="modal-footer ">
+            <button type="button" id="btnSaveDataService" class="btn waves-effect waves-light btn-info m-0">Save</button>
+            <button type="button" class="btn waves-effect waves-light btn-info m-0 style=display:none" id="btnUpdateDataService">Update</button>
+            <button type="button" class="btn btn-secondary m-0 ms-2" id="btnClose" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+

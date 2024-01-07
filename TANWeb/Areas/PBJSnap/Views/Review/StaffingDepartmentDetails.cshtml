@@ -1,0 +1,29 @@
+﻿@model TAN.DomainModels.Models.StaffingDepartmentModel
+<div class="py-2 border-bottom title-part-padding d-flex justify-content-between align-items-center">
+    <div class="d-flex flex-column">
+        <h4 class="card-title mb-0">Staffing Department Details</h4>
+        <h6>A list of staffing department details for the selected facility.</h6>
+    </div> 
+    <button type="button" onclick="return DownloadStaffingDeptCSV()" class="btn waves-effect waves-light btn-info d-flex btn-sm">
+        <i class="ri-upload-line pe-1"></i>Export
+    </button> 
+</div>
+<div class="card-body"> 
+    <div class="table-responsive m-t-40">
+        <table id="StaffDeptTable" class="table display table-bordered table-striped no-wrap mb-0 w-100 review-staff-list-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th class="totalHours-th">Total Hours</th>
+                    <th class="Staff-th">Total Staff</th>
+                    <th class="Exempt-th">Exempt</th>
+                    <th class="Non-Exempt-th">Non-Exempt</th>
+                    <th class="Contractors-th">Contractors</th>
+                    @* <th class="facility-name-th">Facility Name</th> *@
+                </tr>
+            </thead>
+            <tbody id="jobTitileColumnStaffingInfo">
+            </tbody>
+        </table>
+    </div> 
+</div>

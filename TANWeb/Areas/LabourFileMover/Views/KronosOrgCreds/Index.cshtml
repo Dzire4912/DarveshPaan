@@ -1,0 +1,283 @@
+﻿@using TAN.DomainModels.ViewModels;
+@model TAN.DomainModels.ViewModels.KronosFormViewModel;
+@using Microsoft.AspNetCore.Identity;
+@*@model IEnumerable<AspNetUser>*@
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    ViewData["Title"] = "Kronos Credentials";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Kronos Credentials</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/kronos/Home">Home</a></li>
+                        <li class="breadcrumb-item active"><a href="/kronos/credentials">Kronos Credentials</a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExamplee">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-key-2-line pe-1"></i>
+                            Add Kronos SFTP Credentials
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExamplee">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <form id="KronosForm">
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12 col-lg-4 mb-2 custom-select-arrow ps-0">
+                                            <label class="form-label" for="OrganizationId">Organization<span class="text-danger">*</span></label>
+                                            <select class="form-select" onchange="checkOrgCreds()" name="OrganizationId" id="OrganizationId" asp-items="@(new SelectList(Model.OrgList, "Value", "Text"))">
+                                                <option value="">Select Org</option>
+                                                <!-- Add options here -->
+                                            </select>
+                                            <span id="spOrganizationId" class="text-danger validation"></span>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-header py-2 bg-white border-bottom">
+                                                    <h5 class="card-title mb-0">Kronos Sftp Credentials</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosHostGLC"> Host<span class="text-danger">*</span></label>
+                                                        <input class="form-control" type="text" name="KronosHostGLC" id="KronosHostGLC" />
+                                                        <span id="spKronosHostGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosPortGLC"> Port<span class="text-danger">*</span></label>
+                                                        <input class="form-control" type="text" onkeydown="allowOnlyDigits(event)" name="KronosPortGLC" id="KronosPortGLC" />
+                                                        <span id="spKronosPortGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosUserNameGLC"> UserName<span class="text-danger">*</span></label>
+                                                        <input class="form-control" type="text" autocomplete="new-password" name="KronosUserNameGLC" id="KronosUserNameGLC" />
+                                                        <span id="spKronosUserNameGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosPasswordGLC">Password<span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <input class="form-control" type="password" autocomplete="new-password" name="KronosPasswordGLC" id="KronosPasswordGLC" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text bg-white">
+                                                                    <i class="ri-eye-line hidepswd" onclick="togglePasswordVisibility(this)"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <span id="spKronosPasswordGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-header py-2 bg-white border-bottom">
+                                                    <h5 class="card-title mb-0">Azure Blob Credentials</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="StorageConnectionString">Encryption key Storage Path<span class="text-danger">*</span></label>
+                                                        <input class="form-control" type="text" name="StorageConnectionString" id="StorageConnectionString" />
+                                                        <span id="spStorageConnectionString" class="text-danger validation"></span>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosDecryptOrEncryptKeyBlobNameGLC">Encryption Key Name<span class="text-danger">*</span> </label>
+                                                        <input class="form-control" type="text" name="KronosDecryptOrEncryptKeyBlobNameGLC" id="KronosDecryptOrEncryptKeyBlobNameGLC" />
+                                                        <span id="spKronosDecryptOrEncryptKeyBlobNameGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosDecryptionPasswordGLC">Decryption Password<span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <input class="form-control" type="password" name="KronosDecryptionPasswordGLC" id="KronosDecryptionPasswordGLC" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text bg-white">
+                                                                    <i class="ri-eye-line hidepswd" onclick="togglePasswordVisibility(this)"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <span id="spKronosDecryptionPasswordGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-header py-2 bg-white border-bottom">
+                                                    <h5 class="card-title mb-0">File End Point</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-sm-12 col-lg-4 mb-2">
+                                                        <label class="form-label" for="KronosPunchExportGLC">Kronos Data File path<span class="text-danger">*</span></label>
+                                                        <input class="form-control" type="text" name="KronosPunchExportGLC" id="KronosPunchExportGLC" />
+                                                        <span id="spKronosPunchExportGLC" class="text-danger validation"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 ">
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button onclick="combinedFormSubmit()" id="combinedSubmit" type="button" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-add-fill me-1 align-bottom"></i>Add Credentials</button>
+                                                <button onclick="clearCombinedFormValues()" id="ClearSubmit" type="button" class="btn waves-effect waves-light btn-secondary me-2"><i class="ri-filter-off-line me-1 align-bottom"></i>Clear</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-12 mt-2">
+            <div class="card">
+                <div class="card-header bg-info rounded-0 card-header-ta-blue ">
+                    <h4 class="mb-0 text-white fs-4 fw-normal"><i class="ri-table-line pe-1 align-bottom"></i>Kronos Credentials List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="table-responsive">
+                                <table id="KronosCredsList" class="table display table-bordered table-striped no-wrap user-table-td">
+                                    <thead>
+                                        <tr>
+                                            <th class="border-bottom border-top">
+                                                Oranization
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Facilities Count
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in Model.KronosOrgList)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-sm">
+                                                            <a>
+                                                                @user.OrgName
+                                                            </a>
+                                                            <br>
+
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a>
+                                                        @user.FacilityCount
+                                                    </a>
+                                                </td>
+
+                                                <td>
+
+                                                    <span>
+                                                        <a asp-area="LabourFileMover" asp-controller="KronosOrgCreds" asp-action="GetKronosData"
+                                                           asp-route-Id="@user.OrgId"
+                                                           data-bs-toggle='tooltip' data-bs-placement='top' title='Edit'>
+                                                            <i class="fas fa-edit me-2 fs-4"></i>
+                                                        </a>
+                                                    </span>
+
+                                                    @if (user.IsActive == true)
+                                                    {
+
+                                                        <span>
+                                                            <a
+                                                               onclick="updateKronosStatus('@user.OrgId','0')"
+                                                               data-bs-toggle='tooltip' data-bs-placement='top' title='Active'>
+                                                                <i class="fas fa-toggle-on me-2 text-success fs-4"></i>
+                                                            </a>
+                                                        </span>
+
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <span>
+                                                            <a
+                                                               onclick="updateKronosStatus('@user.OrgId','1')"
+                                                               data-bs-toggle='tooltip' data-bs-placement='top' title='In Active'>
+                                                                <i class="fas fa-toggle-off me-2 text-muted fs-4"></i>
+                                                            </a>
+                                                        </span>
+
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts
+    {
+    @{
+        <partial name="_ValidationScriptsPartial"></partial>
+        <script src="~/scripts/Facility.js"></script>
+
+        <script>
+
+            $(document).ready(function () {
+                $('#KronosCredsList').dataTable().fnDestroy();
+                $('#KronosCredsList').dataTable({
+                    order: [],
+                    pagingType: "full_numbers",
+                    language: {
+                        paginate: {
+                            first: '<i class="fa fa-angle-double-left"></i>',
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>',
+                            last: '<i class="fa fa-angle-double-right"></i>',
+                        }
+                    },
+                    columnDefs: [
+
+                    ]
+                });
+            });
+
+        </script>
+
+
+    }
+}
+
+

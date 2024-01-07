@@ -1,0 +1,200 @@
+﻿@using Microsoft.AspNetCore.Authorization;
+@inject IAuthorizationService AuthorizationService
+@using TAN.DomainModels.Helpers;
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+        ViewData["Title"] = "Submission History";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+        ViewData["Title"] = "Submission History";
+    }
+}
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Submission History</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">History</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="container-fluid pt-2">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseOne"
+                                    aria-expanded="false"
+                                    aria-controls="flush-collapseOne">
+                                <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne"
+                             class="accordion-collapse collapse"
+                             aria-labelledby="flush-headingOne"
+                             data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body bg-light">
+                                <div class="live-preview">
+                                    <div class="row gy-3 custom-select-arrow">
+                                        @if (Model.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                        {
+                                            <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 col-sm-12">
+                                                <div class="overlap-input-field">
+                                                    <label for="placeholderInput" class="form-label">Organization Name</label>
+                                                    <select id="organizationName" class="select2" onchange="getFacilities()" asp-items="@(new SelectList(Model.OrganizationList, "Text", "Text"))">
+                                                        <option selected>Select Organization Name</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
+                                            <div class="overlap-input-field">
+                                                <label for="placeholderInput" class="form-label">Facility Name</label>
+                                                @* <select id="facilityName" class="select2" asp-items="@(new SelectList(Model.FacilityList, "Text", "Text"))"> *@
+                                                <select id="facilityName" class="select2">
+                                                    <option>Select Facility Name</option>
+                                                    @foreach (var item in Model.FacilityList)
+                                                    {
+                                                        <option value="@item.Id">@item.FacilityName</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" fdprocessedid="8hkutvc"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                                <div class="d-flex gap-1 flex-wrap">
+                                                    <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center" fdprocessedid="j8azn"> <i class="ri-refresh-line me-1"></i> Reset</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-12">
+                <div class="card rounded-0">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table display table-bordered table-striped no-wrap w-100" id="historyTable">
+                                <thead>
+                                    <tr>
+                                        <th data-column-name="Date">Date</th>
+                                        <th data-column-name="File Name">File Name</th>
+                                        <th data-column-name="Organization Name">Organization Name</th>
+                                        <th data-column-name="Facility Name">Facility Name</th>
+                                        <th data-column-name="Status">Status</th>
+                                        <th data-column-name="Action">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<button id="btnChangeStatus" style="display:none;" data-bs-toggle="modal" data-bs-target="#SubmissionStatusModal"></button>
+
+<!-- Edit Status Form -->
+<div class="modal fade" id="SubmissionStatusModal" tabindex="-1" aria-labelledby="SubmissionStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="SubmissionStatusModalLabel">Submission Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="HistoryForm" method="post" asp-antiforgery="true">
+                    <div class="panel-body">
+                        <h6 class="mt-2">When you receive your submission report, you can change the status here.</h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group mt-lg mb-3">
+                                <label class="col-sm-3 control-label" for="EditDate">Date</label>
+                                <input id="FileEditDate" class="form-control" name="EditDate" type="text" disabled>
+                                <input id="FileID" class="form-control" name="FileID" type="text" style="display:none;">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group mt-lg mb-3">
+                                <label class="col-sm-3 control-label" for="EditFileName">File Name</label>
+                                <input id="FileEditName" class="form-control" name="EditFileName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group mt-lg custom-select-arrow mb-3">
+                                <label class="col-sm-3 control-label" for="StatusSelectBox">Status</label>
+                                <select id="StatusSelectBox" class="select2" name="StatusSelectBox">
+                                    <option value="0">Pending</option>
+                                    <option value="1">Accepted</option>
+                                    <option value="2">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer pt-0">
+                <!-- The "text-right" class aligns the content to the right -->
+                <button type="submit" id="btnSaveStatus" class="btn waves-effect waves-light btn-info">Save</button>
+                <button id="btnCancel" class="btn waves-effect waves-light btn-secondary modal-dismiss">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <script src="~/scripts/SubmissionHistory.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                initSelect2ForSubmissionHistory();
+                LoadSubmissionData();
+            });
+
+            $('#btnClear').click(function (e) {
+                clearFilter();
+                $('#historyTable').dataTable().fnDestroy();
+                LoadSubmissionData();
+            });
+            $('#btnSearch').click(function (e) {
+                $('#historyTable').dataTable().fnDestroy();
+                LoadSubmissionData();
+            });
+            $('#btnCancel').click(function (e) {
+                clearEditStatusData();
+            });
+            $('#btnSaveStatus').click(function (e) {
+                updateSubmissionData();
+            });
+        </script>
+    }
+        }

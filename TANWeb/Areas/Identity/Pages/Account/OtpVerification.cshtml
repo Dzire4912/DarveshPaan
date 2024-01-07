@@ -1,0 +1,237 @@
+﻿@page
+@model TANWeb.Areas.Identity.Pages.Account.OtpVerificationModel
+@using TAN.DomainModels.Helpers;
+@{
+}
+@{
+    var buildVersion = BuildVersion.version;
+    var description = EnumHelper.GetEnumDescription(buildVersion);
+}
+<div class="row auth-wrapper gx-0">
+    <div class="col-lg-6 col-xl-6 bg-info auth-box-2 on-sidebar leftbar-info">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="row justify-content-center text-center">
+
+                <div class="col-md-5 col-lg-10 col-xl-9 px-lg-0 mt-3">
+                    <div class="left-image m-auto img-left-screens">
+                        <img src="../../assets/images/otp-two-factor.png" class="p-2" alt="logo" />
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-xl-6 d-flex align-items-center justify-content-center">
+        <div class="row justify-content-center w-100 mt-4 mt-lg-0">
+            <div class="col-lg-8 col-xl-8 col-md-8 col-sm-7 col-12">
+                <div class="card" id="loginform">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="d-flex justify-content-center align-items-end logo-wrapper m-auto mb-5">
+                                    <img src="../../assets/images/logo1.png" alt="logo" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h4>One-time Passcode Verification</h4>
+                            <p class="text-muted">
+                                Please enter the OTP sent to your email.
+                            </p>
+                        </div>
+                        <form id="otpform" method="post" class="form-horizontal pt-2 needs-validation">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <input asp-for="Input.Email" id="Email" type="hidden" />
+                            <input asp-for="Input.EmailOTP" id="EmailOTP" type="hidden" />
+
+                            <div id="otp" class="inputs d-flex flex-row justify-content-between mt-2 mb-2">
+                                <input class="me-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="first" maxlength="1" autocomplete="off" />
+                                <input class="me-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="second" maxlength="1" autocomplete="off" />
+                                <input class="me-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="third" maxlength="1" autocomplete="off" />
+                                <input class="me-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="fourth" maxlength="1" autocomplete="off" />
+                                <input class="me-2 text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="fifth" maxlength="1" autocomplete="off" />
+                                <input class="text-center form-control rounded otp-input moveFocus AllowNumbers" type="text" id="sixth" maxlength="1" autocomplete="off" />
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div>
+                                    <label asp-for="Input.RememberMe" class="form-label mb-0">
+                                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                    </label>
+                                </div>
+                                <div class="ms-auto">
+                                    <a href="#" id="ResendOTP">Resend OTP</a>
+                                    <h5 id="CountDown" style="display:none"></h5>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-stretch button-group mt-4">
+                                <button type="submit" onclick="Validate()" class="w-100 btn waves-effect waves-light btn-info">Confirm OTP</button>
+                            </div> 
+                        </form>
+                        
+                        <div class="d-flex align-items-stretch mt-2 justify-content-center">
+                            <a asp-page="./Login" class="d-flex">
+                                <i class="ri-arrow-left-fill mr-2"></i>Back to login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" id="recoverform">
+                    <div class="card-body">
+                        <div class="logo">
+                            <h3>Recover Password</h3>
+                            <p class="text-muted fs-4">
+                                Enter your Email and instructions will be sent to you!
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-4">
+                            <!-- Form -->
+                            <form action="index.html">
+                                <!-- email -->
+                                <div class="mb-4 pb-2">
+                                    <div class="form-floating">
+                                        <input class="form-control form-input-bg"
+                                               type="email"
+                                               required=""
+                                               placeholder="Email address" />
+                                        <label for="tb-email">Email</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-stretch button-group">
+                                    <button type="submit" class="btn btn-info btn-lg px-4">Submit</button>
+                                    <a href="javascript:void(0)"
+                                       id="to-login"
+                                       class="btn btn-lg btn-light-secondary text-secondary font-medium">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mb-3">@description</div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $(".AllowNumbers").on("keydown", function (event) {
+                // Allow only numeric digits (0-9) and some special keys like Backspace, Delete, Arrow keys, etc.
+                var allowedKeys = [8, 9,17, 37, 39, 46,86]; // Add more key codes if needed
+
+                // Check if the pressed key is not in the allowed keys list and is not a numeric digit
+                if (allowedKeys.indexOf(event.keyCode) === -1 && !(event.key >= "0" && event.key <= "9")) {
+                    event.preventDefault(); // Prevent the key press
+                }
+            });
+        });
+        $("#ResendOTP").on("click", function () {
+            $("#ResendOTP").css("display", "none");
+            $("#CountDown").css("display", "block");
+            startTimer();
+            $.ajax({
+                type: 'GET',
+                url: '/Identity/Account/ResendOTP?Email=' + $('#Email').val().trim(),
+                success: function (response) { 
+                    //alert('OTP send to your email.');
+                },
+                error: function (err) {
+                    onTimesUp();
+                    $("#CountDown").css("display", "none");
+                    $("#ResendOTP").css("display", "block"); 
+                }
+            })
+        });
+
+
+        let timerInterval = null;
+        function onTimesUp() {
+            clearInterval(timerInterval);
+        }
+
+        function startTimer() {
+            var counter = 60;
+            timerInterval = setInterval(() => {
+                counter--;
+                if (counter == 0) {
+                    onTimesUp();
+                    $('#CountDown').text("");
+                    $("#CountDown").css("display", "none");
+                    $("#ResendOTP").css("display", "block");
+                } else {
+                    $('#CountDown').text(counter + " secs");
+                }
+            }, 1000);
+        }
+
+        function Validate() {
+            var emailOtp = '';
+            $('#EmailOTP').val('');
+            $("#otpform input[type=text]")
+                .each(function () {
+                    if ($(this).val().trim() == '') {
+                        return false;
+                    }
+                    emailOtp += $(this).val().trim();
+                });
+
+            $('#EmailOTP').val(emailOtp);
+        }
+
+        $('.moveFocus').on('input', function (event) {
+            event.preventDefault();
+            var inputLength = $(this).val().length;
+            if (inputLength === 1) {
+                if ($(this).index() < 5) {
+                    $(this).next('.moveFocus').focus();
+                } else {
+                    $(this).blur();
+                }
+            }
+        });
+        $('.AllowNumbers').on('input', function (event) {
+            var inputValue = $(this).val().replace(/[^0-9]/g, '');
+
+            if (inputValue.length === 6) {
+                var otpArray = inputValue.split('');
+
+                $('.moveFocus').each(function (index) {
+                    if (index < 6) {
+                        $(this).val(otpArray[index]);
+                    }
+                });
+            }
+        });
+
+        $('.AllowNumbers').on('paste', function (event) {
+            var inputElement = this;
+
+            navigator.clipboard.readText()
+                .then(function (pastedText) {
+                    if (pastedText && pastedText.match(/^\d+$/)) {
+                        var otpArray = pastedText.split('');
+
+                        if (otpArray.length === 6) {
+                            $('.moveFocus').each(function (index) {
+                                if (index < 6) {
+                                    $(this).val(otpArray[index]);
+                                }
+                            });
+                        }
+                    } else {
+                        inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Failed to read clipboard data:', error);
+                });
+        });
+
+
+    </script>
+}
+
+
+

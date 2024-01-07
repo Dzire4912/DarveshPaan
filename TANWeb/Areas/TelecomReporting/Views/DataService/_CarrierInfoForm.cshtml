@@ -1,0 +1,24 @@
+﻿@model TAN.DomainModels.ViewModels.CarrierInfomationViewModel
+<div class="page-content">
+    <div class="container-fluid">
+        <form id="addCarrierForm" asp-antiforgery="true">
+            <div class="form-group mb-3">
+                <input type="hidden" asp-for="CarrierId" class="form-control" id="carrierId" />
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="CarrierName" class="control-label">Carrier Name<span class="text-danger">*</span></label>
+                        <input asp-for="CarrierName" class="form-control" id="carrierName" onblur="validateInputOnBlur(this)" />
+                        <span asp-validation-for="CarrierName" class="text-danger errormsg" id="carrierName_Error"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-0 pe-0 pt-0">
+                <button type="button" class="btn waves-effect waves-light btn-info" id="btnSaveCarrier">Save</button>
+                <button type="button" class="btn waves-effect waves-light btn-info" style="display:none;" id="btnUpdateCarrier">Update</button>
+                <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal" onclick="clearCarrierData()">Close</button>
+            </div>
+        </form>
+    </div>
+</div>

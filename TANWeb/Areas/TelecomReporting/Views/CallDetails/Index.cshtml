@@ -1,0 +1,322 @@
+﻿@model TAN.DomainModels.ViewModels.BandwidthCallSearchViewModel
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization;
+@using TAN.DomainModels.Helpers;
+@{
+    Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+}
+
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-12 align-self-center">
+            <h4 class="page-title">Call Details</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Call Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="ri-filter-line pe-1"></i> Call Details Information
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body bg-light" id="filterDiv">
+                            <div class="live-preview">
+                                <div class="row g-3 align-items-end custom-select-arrow">
+                                    @if (Model.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                    {
+                                        <div class="col-md-3 col-lg-3 col-sm-3 overlap-input-field">
+                                            <label for="placeholderInput" class="form-label"> Organization Name </label>
+                                            <select id="organizationFilter" class="select2">
+                                                <option value="">Select Organization Name</option>
+                                                @foreach (var item in Model.bandwidthAccessLists)
+                                                {
+                                                    <option value="@item.SubAccountId">@item.OrganizationName - @item.SubAccountId</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    }
+                                    <div class="col-md-3 col-lg-3 col-sm-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label"> Call Direction </label>
+                                        <select id="callDirectionFilter" class="select2">
+                                            <option value="">Select Call Direction</option>
+                                            @foreach (var item in Model.CallDirection)
+                                            {
+                                                <option value="@item.Value">@item.Text.Substring(0, 1).ToUpper()@item.Text.Substring(1).ToLower()</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-sm-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label"> Call Type </label>
+                                        <select id="callTypeFilter" class="select2">
+                                            <option value="">Select Call Type</option>
+                                            @foreach (var item in Model.CallType)
+                                            {
+                                                <option value="@item.Value">@item.Text.Substring(0, 1).ToUpper()@item.Text.Substring(1).ToLower()</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-sm-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label"> Call Result </label>
+                                        <select id="callResultFilter" class="select2">
+                                            <option value="">Select Call Result</option>
+                                            @foreach (var item in Model.CallResult)
+                                            {
+                                                <option value="@item.Value">@item.Text.Substring(0, 1).ToUpper()@item.Text.Substring(1).ToLower()</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3 col-lg-3 col-sm-3 overlap-input-field">
+                                        <label for="placeholderInput" class="form-label"> Hangup source </label>
+                                        <select id="hangUpSourceFilter" class="select2">
+                                            <option value="">Select Hangup source</option>
+                                            @foreach (var item in Model.HangUpSource)
+                                            {
+                                                <option value="@item.Value">@item.Text.Substring(0, 1).ToUpper()@item.Text.Substring(1).ToLower()</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-12 col-lg- col-xl-2 me-3 btn-width">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button class="btn waves-effect waves-light btn-info" onclick="loadCallDetailsData()"><i class="ri-equalizer-fill me-1 align-bottom"></i>Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        @Html.Partial("GetCallDetailsData")
+    </div>
+
+</div>
+
+<div class="modal fade" id="GetCallDetails" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="AgencyModalLabel">Call Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">Organization Name</label>
+                            <div class="clearfix"></div>
+                            <span id="organizationName"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Account Id
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="accountId"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Call Id
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="callId"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Start time
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="startTime"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                End time
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="endTime">End time</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Duration
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="duration"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Calling Number
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="callingNumber"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Called Number
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="calledNumber"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Call Direction
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="callDirection"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Call Type
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="callType"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Call Result
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="callResult"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Sip Response Code
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="sipResponseCode"></span>
+                        </div>
+                    </div> <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Sip Response Description
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="sipResponseDescription"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 ">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Cost
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="cost"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Attestation Indicator
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="attestationIndication"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Hang Up Source
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="hangUpSource"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Post Dial Delay
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="postDialDelay"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Pockets Sent
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="pocketsSent"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Pockets Received
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="pocketsReceived"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="form-group mb-2">
+                            <label class="control-label">
+                                Is Active
+                            </label>
+                            <div class="clearfix"></div>
+                            <span id="isActive"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/scripts/telecom/calldetail.js"></script>
+    <script>
+        $('#btnClear').click(function (e) {
+            clearFilter();
+            $('#BandwidthCallDetailsTable').dataTable().fnDestroy();
+            loadCallDetailsData();
+        });
+    </script>
+}

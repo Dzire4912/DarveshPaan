@@ -1,0 +1,555 @@
+﻿@using TAN.DomainModels.ViewModels;
+@model TAN.DomainModels.ViewModels.KronosFacilitiesVM;
+@using Microsoft.AspNetCore.Identity;
+@*@model IEnumerable<AspNetUser>*@
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    ViewData["Title"] = "Kronos Home";
+}
+
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Kronos</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/kronos/home">Home</a></li>                      
+                        <li class="breadcrumb-item active"><a href="#">@ViewData["Title"]</a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+@* <div class="container">
+    <a asp-area="LabourFileMover" asp-controller="KronosHome" asp-action="TriggerWork">Trigger Work</a>
+</div> *@
+<div class="container-fluid main-content-height pt-0">
+ 
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush" id="accordionFlushExamplenew">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2 collapsed" type="button" id="EntriesAccordian" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            <i class="ri-table-line pe-1"></i>  Kronos Trail
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExamplenew">
+                        <div class="accordion-body bg-white">
+
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="table-responsive">
+                                        <table id="KronosDataEntryList" class="table display table-bordered table-striped no-wrap user-table-td Kronos-trail">
+                                            <thead>
+                                                <tr>
+                                                    <th class="border-bottom border-top Kronos-trail-action">
+                                                        Action
+                                                    </th>                                                  
+                                                  
+                                                    <th class="border-bottom border-top Kronos-trail-attempts-th">
+                                                        #Attempts
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-trail-records-th">
+                                                        Records
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-trail-status-th">
+                                                        Status
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-trail-destination-th">
+                                                        Destination
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-trail-description-th">
+                                                        Description
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-trail-date-th">
+                                                        Date
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.tracks)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-sm" id="fId">
+                                                                    <a>
+                                                                        @item.Source
+                                                                    </a>
+
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @if (item.AutoSyncCount > 0)
+                                                            {
+                                                                <a>
+                                                                    @item.AutoSyncCount
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a>
+                                                                    <text> NA </text>
+                                                                </a>
+                                                            }
+                                                        </td>
+                                                       
+                                                      
+                                                        <td>
+                                                            @if (item.RecordsCount > 0)
+                                                            {
+                                                                <a>
+                                                                    @item.RecordsCount
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a>
+                                                                    <text> NA </text>
+                                                                </a>
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @if (item.Status == 1)
+                                                            {
+                                                                <a>In progress</a>
+                                                            }
+                                                            else if(item.Status==2)
+                                                            {
+                                                                   <a> Completed </a>
+                                                            }
+                                                            else if (item.Status == 3)
+                                                            {
+                                                                <a>Failed</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a>
+                                                                    <text> Undefined </text>
+                                                                </a>
+                                                            }
+                                                           </td>                                                       
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-sm" id="fId">
+                                                                    <a>
+                                                                        @item.ToTable
+                                                                    </a>
+
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <a>
+                                                                @if (string.IsNullOrEmpty(item.Description))
+                                                                {
+                                                                    <text>NA</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @item.Description
+                                                                }
+
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a>
+                                                                @item.CreatedDate
+                                                            </a>
+                                                        </td>
+
+
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+     
+        <!-- New Accordion for Kronos Unprocessed Data -->
+   
+        <div class="col-xl-12 mt-2">
+            <div class="accordion accordion-flush" id="accordionFlushUnprocessed">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingUnprocessed">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2 collapsed" type="button" id="UnprocessedAccordian" data-bs-toggle="collapse" data-bs-target="#flush-collapseUnprocessed" aria-expanded="false" aria-controls="flush-collapseUnprocessed">
+                            <i class="ri-table-line pe-1"></i> Kronos Unprocessed Data
+                        </button>
+                    </h2>
+                    <div id="flush-collapseUnprocessed" class="accordion-collapse collapse " aria-labelledby="flush-headingUnprocessed" data-bs-parent="#accordionFlushUnprocessed">
+                        <div class="accordion-body bg-white">
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="table-responsive">
+                                        <table id="KronosUnprocessedList" class="table display table-bordered table-striped no-wrap user-table-td Kronos-unprocessed">
+                                            <thead>
+                                                <tr>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-organization-th">
+                                                        Organization
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-facility-th">
+                                                        Facility Id
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-employee-th">
+                                                        Employee Id
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-workday-th">
+                                                        Workday
+                                                    </th>
+
+                                                    <th class="border-bottom border-top Kronos-unprocessed-paytype-th">
+                                                        Paytype
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-jobtype-th">
+                                                        JobType
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-department-th">
+                                                        Department code
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-HrJob-th">
+                                                        HrJob
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-TotalHours-th">
+                                                        TotalHours
+                                                    </th>
+                                                    <th class="border-bottom border-top Kronos-unprocessed-reason-th">
+                                                        Reason
+                                                    </th>
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.KronosUnprocessedData)
+                                                {
+                                                    <tr>
+
+                                                        <td>
+                                                            <a>
+                                                                @item.OrganizationName
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-sm" id="fId">
+                                                                    <a>
+                                                                        @item.facilityId
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <a>
+                                                                @item.EmployeeID
+                                                            </a>
+                                                        </td>
+
+                                                        <td>
+                                                            <a>
+                                                                @item.ADJUSTEDAPPLYDATE.ToString("dd-MM-yyyy")
+                                                            </a>
+                                                        </td>
+
+                                                        <td>
+                                                            @item.PayCode
+                                                        </td>
+                                                        <td>
+                                                            @item.JOBCODE
+                                                        </td>
+                                                        <td>
+                                                            @item.DEPARTMENTNUMBER
+
+                                                        </td>
+                                                        <td>
+                                                            @item.HrJob
+
+                                                        </td>
+                                                        <td>
+                                                            @item.TIMEINHOURS
+
+                                                        </td>
+                                                      
+                                                        <td>
+                                                            @item.Reason
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
+        @if (Model.kronos.Count>0)
+        {
+            <div class="col-xl-12 mt-2">
+                <div class="card">
+
+                    <div class="card-header bg-info rounded-0 card-header-ta-blue">
+                        <h4 class="mb-0 text-white fs-4 fw-normal"><i class="ri-table-line pe-1 align-bottom"></i>Kronos New Facilities</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="table-responsive">
+                                    <table id="KronosFacilityList" class="table display table-bordered table-striped no-wrap user-table-td">
+                                        <thead>
+                                            <tr>
+                                                <th class="border-bottom border-top">
+                                                    Facility Id
+                                                </th>
+                                                <th class="border-bottom border-top">
+                                                    Organization
+                                                </th>
+                                                <th class="border-bottom border-top">
+                                                    Auto Sync Date
+                                                </th>
+
+                                                <th class="border-bottom border-top">
+                                                    Auto Synchronizable?
+                                                </th>
+                                                <th class="border-bottom border-top">
+                                                    Action
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.kronos)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-sm" id="fId">
+                                                                <a>
+                                                                    @item.FacilityId
+                                                                </a>
+                                                                <br>
+
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <a>
+                                                            @item.OrgName
+                                                        </a>
+                                                    </td>
+
+                                                    <td>
+                                                        <a>
+                                                            @item.Refreshmentdate
+                                                        </a>
+                                                    </td>                                              
+
+                                                    <td>
+                                                        @if (Convert.ToBoolean(item.IsAvailable) == true)
+                                                        {
+                                                            <span>
+                                                                <a data-bs-toggle='tooltip' data-bs-placement='top' title='Active' class="d-flex align-items-center">
+                                                                    <i class="ri-checkbox-circle-line me-1 text-success fs-4"></i>
+                                                                    <span class="text-success">Eligible to retrieve Data</span>
+                                                                </a>
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>
+                                                                <a data-bs-toggle='tooltip' data-bs-placement='top' title='In Active' class="d-flex align-items-center">
+                                                                    <i class="ri-time-line me-1 text-warning fs-4"></i>
+                                                                    <span class="text-warning">Waiting to Add Facility</span>
+                                                                </a>
+                                                            </span>
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        @if (item.IsAvailable)
+                                                        {
+                                                            @* <a href="" id="btnAddFacility" title="Add Facility"><i class="ri-add-circle-line fs-6 pe-2 text-primary"></i></a> *@
+                                                            <a href="#" onclick="return sendToProcess('@Html.Raw(item.FacilityId)',@item.OrganizationId); " id="retrieveFacilityData" title="Retrieve Data">
+                                                                <i class="ri-file-transfer-line fs-6 pe-2 text-success"></i>
+                                                            </a>
+                                                            @*                                                         <button onclick="sendToProcess('@Html.Raw(item.FacilityId)',@item.OrganizationId)"><i class="ri-file-transfer-line fs-6 pe-2 text-success"></i></button>
+ *@
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <a href="" id="btnAddFacility" onclick="openModal('@Html.Raw(item.FacilityId)',@item.OrganizationId,@ViewBag.FirstOrg); return false;" data-bs-toggle="modal" data-bs-target="#KronosFacilityModal" title="Add Facility"><i class="ri-add-circle-line fs-6 pe-2 text-primary"></i></a>
+                                                            @* <a href="" id="retrieveFacilityData" onclick="sendToProcess('@Html.Raw(item.FacilityId)')" title="Retrieve Data"><i class="ri-arrow-go-forward-line fs-6 pe-2 text-success"></i></a> *@
+                                                        }
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+
+
+
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="KronosFacilityModal" tabindex="-1" aria-labelledby="KronosFacilityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="kronosFacilityModalLabel">Add Facility</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <partial name="~/Views/Shared/_kronosFacilityForm.cshtml" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section PageScripts
+{
+    @{
+                        <partial name="_ValidationScriptsPartial"></partial>
+    <script src="~/scripts/Facility.js"></script>
+    <script>
+                            $('#KronosFacilityList').dataTable().fnDestroy();
+                            $('#KronosFacilityList').dataTable({
+                                order: [],
+                                pagingType: "full_numbers",
+                                language: {
+                                    paginate: {
+                                        first: '<i class="fa fa-angle-double-left"></i>',
+                                        previous: '<i class="fa fa-angle-left"></i>',
+                                        next: '<i class="fa fa-angle-right"></i>',
+                                        last: '<i class="fa fa-angle-double-right"></i>',
+                                    }
+                                },
+                                columnDefs: [
+                                    { orderable: false, targets: [1] }
+                                ]
+                            });
+
+    </script>
+                // KronosDataEntryList
+
+    <script>
+                            $('#KronosDataEntryList').dataTable().fnDestroy();
+                            $('#KronosDataEntryList').dataTable({
+                                order: [],
+                                pagingType: "full_numbers",
+                                language: {
+                                    paginate: {
+                                        first: '<i class="fa fa-angle-double-left"></i>',
+                                        previous: '<i class="fa fa-angle-left"></i>',
+                                        next: '<i class="fa fa-angle-right"></i>',
+                                        last: '<i class="fa fa-angle-double-right"></i>',
+                                    }
+                                },
+
+                            });
+            
+
+    </script>
+    <script>
+            $('#KronosUnprocessedList').dataTable().fnDestroy();
+            $('#KronosUnprocessedList').dataTable({
+                order: [],
+                pagingType: "full_numbers",
+                language: {
+                    paginate: {
+                        first: '<i class="fa fa-angle-double-left"></i>',
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>',
+                        last: '<i class="fa fa-angle-double-right"></i>',
+                    }
+                },
+
+            });
+    </script>
+    <script type="text/javascript">
+
+                            $(document).ready(function () {
+                                $('#KronosFacilityModal').modal({
+                                    backdrop: 'static',
+                                    keyboard: false
+                                });
+
+                                $('#facilityState').on('select2:select', function () {
+                                    var errorId = $(this).data('error-id');
+                                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                                    errorSpan.text('');
+                                });
+                                $('#facilityOrganizationName').on('select2:select', function () {
+                                    var errorId = $(this).data('error-id');
+                                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                                    errorSpan.text('');
+                                });
+                                $('#facilityApplicationName').on('select2:select', function () {
+                                    var errorId = $(this).data('error-id');
+                                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                                    errorSpan.text('');
+                                });
+
+
+                            });
+
+                            $('#btnSaveFacility').click(function (e) {
+                                if (validateFacilityForm()) {
+                                    if (checkDeduction()) {
+                                        kronossaveFacility();
+                                        e.preventDefault();
+                                    }
+                                   if (!checkDeduction()){                                       
+                                     e.preventDefault();
+                                    }
+
+                                }
+                            });
+                         
+                            $('#btnClose').click(function (e) {
+                                clearFacilityData();
+                            });
+
+
+
+    </script>
+
+   }
+}

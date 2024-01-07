@@ -1,0 +1,224 @@
+﻿@using TAN.DomainModels.ViewModels;
+@model TAN.DomainModels.ViewModels.KronosPendingVM;
+@using Microsoft.AspNetCore.Identity;
+@*@model IEnumerable<AspNetUser>*@
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    ViewData["Title"] = "Kronos UI";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col--lg-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Compare & Update Kronos vs Timesheet Data</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/kronos/home">Home</a></li>
+                        <li class="breadcrumb-item active"><a href="/kronos/conflicts">Compare & Update Kronos vs Timesheet Data</a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filters</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-6 col-sm-12 col-lg-3">
+                                        <label for="placeholderInput" class="form-label">Employee Name</label>
+                                        <div class="search-box">
+                                        <input type="text" class="form-control search lh-base" id="UserName" placeholder="Search By Empoyee Name">
+                                    </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                        <label for="placeholderInput" class="form-label">Organization</label>
+                                        <select class="form-select select2" id="Orglist" onchange="getFacilities()" asp-items="@(new SelectList(Model.Orglist, "Value", "Text"))">
+                                        <option value="" selected>Select Organization</option>
+                                    </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                        <label for="placeholderInput" class="form-label">Facility</label>
+                                        <select class="form-select select2" onchange="getEmployees()" id="Facility" asp-items="@(new SelectList(Model.facilityList, "Value", "Text"))">
+                                        <option value="" selected>Select Facility</option>
+                                    </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                        <label for="placeholderInput" class="form-label">Employee</label>
+                                        <select class="form-select select2" id="EmployeeList" asp-items="@(new SelectList(Model.EmployeeList, "Value", "Text"))">
+                                        <option value="" selected>Select Employee Id </option>
+                                    </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                        <label for="placeholderInput" class="form-label">Quarter</label>
+                                         <select class="form-select select2" id="QuarterList" asp-items="@(new SelectList(Model.QuarterList, "Value", "Text"))">
+                                        <option value="" selected>Select Quarter</option>
+                                    </select>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-12 col-lg-4 col-xl-2 me-3 btn-width">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button onclick="pendingDataFilters()" type="button" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                               <button onclick="filterReset()" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12 mt-2">
+            <div class="card">
+                <div class="card-header bg-info rounded-0 card-header-ta-blue">
+                    <h4 class="mb-0 text-white fs-4 fw-normal"><i class="ri-table-line pe-1 align-bottom"></i>Kronos Conflicts List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="table-responsive">
+                                <table id="KronosPendingList" class="table display table-bordered table-striped no-wrap user-table-td">
+                                    <thead>
+                                        <tr>
+                                            <th class="border-bottom border-top">
+                                                Employee Id
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Employee Name
+                                                </th>
+                                            <th class="border-bottom border-top">
+                                                Facility Id
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Date
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.kronosPendingdata)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-sm" id="fId">
+                                                            <a>
+                                                                @item.EmployeeId
+                                                            </a>                                                           
+
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                     <a>
+                                                        @if (item.EmployeeName != null)
+                                                        {
+                                                            @item.EmployeeName
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>NA</text>
+                                                        }
+                                                     </a>
+                                                </td>
+                                                <td>
+                                                    <a>
+                                                        @item.FacilityName
+                                                        <input type="hidden" @item.FacilityId  />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a>
+                                                        @item.WorkDay.ToString("MM-dd-yyyy")
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="#" onclick="getComparionPartial(@item.rowid)" data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                    <i class="ri-eye-line fs-6 pe-2 text-success"></i></a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade kronos-creds-modal" id="ComparisonModal" tabindex="-1" aria-labelledby="ComparisonModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="ComparisonModalLabel">Compare & Update </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="ComparisionpartialViewContainer" class="w-100">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section PageScripts 
+{
+    @{
+        <partial name="_ValidationScriptsPartial"></partial>
+
+        <script>
+            $('#KronosPendingList').dataTable().fnDestroy();
+            $('#KronosPendingList').dataTable({
+                order: [],
+                pagingType: "full_numbers",
+                language: {
+                    paginate: {
+                        first: '<i class="fa fa-angle-double-left"></i>',
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>',
+                        last: '<i class="fa fa-angle-double-right"></i>',
+                    }
+                },
+                columnDefs: [
+                    { orderable: false, targets: [3] }
+                ]
+            });
+
+        </script>
+      }
+}

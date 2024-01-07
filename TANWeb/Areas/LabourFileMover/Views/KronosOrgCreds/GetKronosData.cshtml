@@ -1,0 +1,170 @@
+﻿@using TAN.DomainModels.ViewModels;
+@model TAN.DomainModels.ViewModels.KronosFormViewModel;
+@using Microsoft.AspNetCore.Identity;
+@*@model IEnumerable<AspNetUser>*@
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    ViewData["Title"] = "Kronos UI";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-sm-12 align-self-center">
+            <h4 class="card-title mb-0">Update Kronos Credentials</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/kronos/home">Home</a></li>
+                        <li class="breadcrumb-item active"><a href="/update/credentials">Update Kronos Credentials</a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="card">
+        <div class="card-body">
+            <form id="UpdateKronosInform">
+                <div class="row">
+
+                    <div class="col-lg-6 custom-select-arrow mb-3">
+                        <div class="form-group overlap-input-field">
+                            <label for="OrganizationId" class="form-label">Organization<span class="text-danger">*</span></label>
+                            <select class="select2" name="OrganizationId" id="OrganizationId" asp-items="@(new SelectList(Model.OrgList, "Value", "Text"))">
+                                <option value="">Select Org</option>
+                                <!-- Add options here -->
+                            </select>
+                            <span id="spOrganizationId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="card mb-0">
+                        <div class="card-header"><h5 class="mb-0">Kronos Sftp Credentials</h5></div>
+                        <div class="card-body">
+                           <div class="row">
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group">
+                                        <label for="KronosHostGLC" class="form-label"> Host<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" asp-for="@Model.KronosHostGLC " name="KronosHostGLC" id="KronosHostGLC" />
+                                        <span id="spKronosHostGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group">
+                                        <label for="KronosPortGLC" class="form-label"> Port<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" asp-for="@Model.KronosPortGLC " name="KronosPortGLC" id="KronosPortGLC" />
+                                        <span id="spKronosPortGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group">
+                                        <label for="KronosUserNameGLC" class="form-label"> UserName<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" asp-for="@Model.KronosUserNameGLC " name="KronosUserNameGLC" id="KronosUserNameGLC" />
+                                        <span id="spKronosUserNameGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group position-relative">
+                                        <label for="KronosPasswordGLC" class="form-label"> Password<span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control " value="@Model.KronosPasswordGLC" name="KronosPasswordGLC" id="KronosPasswordGLC" />
+
+                                            <div class="input-group-append">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="ri-eye-line hidepswd" onclick="togglePasswordVisibility(this)"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span id="spKronosPasswordGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                           </div>
+                        </div>
+                    </div>
+                    <div class="card mb-0">
+                        <div class="card-header"><h5 class="mb-0">Azure Blob credentials</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group">
+                                        <label for="StorageConnectionString" class="form-label"> Encryption Key Storage Path<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" asp-for="@Model.StorageConnectionString " name="StorageConnectionString" id="StorageConnectionString" />
+                                        <span id="spStorageConnectionString" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group">
+                                        <label for="KronosDecryptOrEncryptKeyBlobNameGLC" class="form-label">Encryption Key Name<span class="text-danger">*</span> </label>
+                                        <input type="text" class="form-control" asp-for="@Model.KronosDecryptOrEncryptKeyBlobNameGLC" name="KronosDecryptOrEncryptKeyBlobNameGLC" id="KronosDecryptOrEncryptKeyBlobNameGLC" />
+                                        <span id="spKronosDecryptOrEncryptKeyBlobNameGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group position-relative">
+                                        <label for="KronosDecryptionPasswordGLC" class="form-label"> Decryption Password<span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control " value="@Model.KronosDecryptionPasswordGLC" name="KronosDecryptionPasswordGLC" id="KronosDecryptionPasswordGLC" />
+
+                                            <div class="input-group-append">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="ri-eye-line hidepswd" onclick="togglePasswordVisibility(this)"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span id="spKronosDecryptionPasswordGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-0">
+                        <div class="card-header"><h5 class="mb-0">File End Points</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6 mb-2">
+                                    <div class="form-group ">
+                                        <label for="KronosPunchExportGLC" class="form-label"> Data File path<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" asp-for="@Model.KronosPunchExportGLC" name="KronosPunchExportGLC" id="KronosPunchExportGLC" />
+                                        <span id="spKronosPunchExportGLC" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+  
+                    <div class="col-12">
+                        <div class="d-md-flex align-items-center mt-3">
+                            <div class="ms-auto mt-3 mt-md-0">
+                                <button type="button" onclick="updateKronosForm()" class="btn btn-info">Update</button>
+                                @*<button type="button" class="btn btn-secondary" href="@Url.Action("index","KronosOrgCreds",new{Area="LaborFileMover"})">Close</button>*@
+                                <a href="/kronos/credentials" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section PageScripts
+    {
+    @{
+        <partial name="_ValidationScriptsPartial"></partial>
+
+        <script>
+            $(document).ready(function () {
+                var newOrgId = @Html.Raw(Json.Serialize(ViewBag.Org));
+                $("#OrganizationId").val(newOrgId).trigger('change');
+                $("#OrganizationId").prop("disabled", true);
+            });
+        </script>
+
+       
+
+    }
+}

@@ -1,0 +1,102 @@
+﻿@model TAN.DomainModels.Models.EmployeeViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Employee</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Employee</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="ri-filter-line pe-1"></i> Employee
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body bg-white" id="filterDiv">
+                            <div class="row gy-3 custom-select-arrow">
+                                <div id="FacilityIdDiv" class="col-xxl-3 col-lg-3 col-xl-3 col-md-3 overlap-input-field">
+
+                                    <label for="placeholderInput" class="form-label">Facility <span class="text-danger">*</span></label>
+                                    <div class="clearfix"></div>
+                                    <select id="FacilityId" class="select2 sm-3" aria-label="Default select example">
+                                        <option>Select Facility Name</option>
+                                        @foreach (var item in Model.FacilityList)
+                                        {
+                                            <option value="@item.Id">@item.FacilityName</option>
+                                        }
+                                    </select>
+
+                                </div>
+                                @* <div class="col-xxl-3 col-lg-3 col-xl-3 col-md-3">
+
+                                <label for="placeholderInput" class="form-label">Year<span class="text-danger">*</span></label>
+                                <div class="clearfix"></div>
+                                <select id="YearList" class="form-select sm-3" aria-label="Default select example"></select>
+
+                                </div>
+                                <div class="col-xxl-3 col-lg-3 col-xl-3 col-md-3">
+
+                                <label for="placeholderInput" class="form-label">Quarter<span class="text-danger">*</span></label>
+                                <div class="clearfix"></div>
+                                <select id="QuarterList" class="form-select sm-3" aria-label="Default select example"></select>
+
+                                </div> *@
+                                @* <div class="col-xxl-3 col-lg-3 col-xl-3 col-md-3">
+                                <button class="btn btn-primary" onclick="getUploadFileDetails()">Filter</button>
+                                </div> *@
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        <button id="btnSearch" type="button" class="btn waves-effect waves-light btn-info me-2" fdprocessedid="8hkutvc" onclick="getUploadFileDetails()"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center" fdprocessedid="j8azn"> <i class="ri-refresh-line me-1"></i> Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        @Html.Partial("EmployeeList", Model.EmployeeDetailModel)
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_CommonScriptsPartial" />
+    <script src="~/scripts/Employee.js"></script>
+    <script>
+        $('#btnSearch').click(function (e) {
+            loadEmployeeList();
+        });
+
+        $('#btnClear').click(function (e) {
+            clearFilter();
+            $('#EmployeeListDataTable').dataTable().fnDestroy();
+            loadEmployeeList();
+        });
+    </script>
+}

@@ -1,0 +1,42 @@
+﻿@using TAN.DomainModels.Entities;
+@model TAN.DomainModels.Entities.UserViewModel;
+
+@using Microsoft.AspNetCore.Identity;
+@*@model IEnumerable<AspNetUser>*@
+@inject IAuthorizationService AuthorizationService
+
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@{
+    ViewData["Title"] = "Permission Management";
+    Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+}
+@*<div class="page-wrapper">*@
+    <div class="container-fluid main-content-height">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mt-5">
+                    <h1 class="mb-1">Welcome to </h1>
+                    <h1 class="text-info mb-3">Inventory Management</h1>
+                    <p class="mb-4 text-dark h4 fw-light">Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.
+                        Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.
+                    </p>
+                    @*@if ((AuthorizationService.AuthorizeAsync(User,
+                    Permissions.UserManagement.InventoryView)).Result.Succeeded)
+                    {
+                        <button id="btnAddUser" class="btn waves-effect waves-light btn-info addMembers-modal"
+                                data-bs-toggle="modal" data-bs-target="#addmemberModal">
+                            <i class="ri-add-fill me-1 align-bottom"></i> Add User
+                        </button>
+
+                    }*@
+                </div>
+                
+            </div>
+           <div class="col-lg-6">
+                <img src="~/assets/images/inventoryBg.png" alt="Inventory management" class="img-responsive" />
+           </div>
+         </div>
+       
+    </div>
+@*</div>*@

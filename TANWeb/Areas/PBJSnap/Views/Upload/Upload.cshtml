@@ -1,0 +1,189 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.UploadModel.UploadView
+@{
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Upload</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Upload</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fs-4 rounded-0 d-flex py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="ri-filter-line pe-1"></i> Upload Staffing Information
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body bg-white" id="filterDiv">
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="alert bg-light mb-3 py-2 filter-info text-dark border">
+                                        <div class="row">
+                                            <div class="col-md-11 px-2">
+                                                Import your data by selecting the facility, quarter, and type of data you are uploading. If you prefer to load the information manually, please <a href="~/PBJSnap/Review/Index">continue</a> to step 2.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gy-3 custom-select-arrow">
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Facility <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="FacilityId" class="form-select select2 sm-3" aria-label="Default select example" onchange="getAgencies()">
+                                            @*<option value="" selected>Select</option>*@
+                                            @{
+                                                foreach (var item in Model.FacilityList)
+                                                {
+                                                    <option value="@item.Id">@item.FacilityName</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 overlap-input-field">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Agencies</label>
+                                        <div class="clearfix"></div>
+                                        <select id="AgenciesId" class="form-select select2 sm-3" aria-label="Default select example">
+                                            <option value="" selected>Select Agency</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Year <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select class="form-select sm-3" aria-label="Default select example" id="YearList">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Quarter <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="QuarterList" class="form-select sm-3" aria-label="Default select example" onchange="getMonthList()">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Month</label>
+                                        <div class="clearfix"></div>
+                                        <select class="form-select sm-3" aria-label="Default select example" id="MonthList">
+                                            <option selected>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-3 col-md-4">
+                                    <div>
+                                        <label for="placeholderInput" class="form-label">Upload Type <span class="text-danger">*</span></label>
+                                        <div class="clearfix"></div>
+                                        <select id="UploadType" class="form-select sm-3" aria-label="Default select example">
+                                            <option value="0" selected>Select</option>
+                                            <option value="1">Staff</option>
+                                            <option value="2">Hours</option>
+                                            <option value="3">Staff and Hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                @if ((AuthorizationService.AuthorizeAsync(User,
+                                Permissions.Upload.PBJSnapUpload)).Result.Succeeded)
+                                {
+                                    @*  <div class="col-xxl-3 col-md-4">
+                                <div>
+                                <label for="placeholderInput" class="form-label">Upload File <span class="text-danger">*</span></label>
+                                <div class="clearfix"></div>
+                                <input type="file" id="fileUpload" class="fileUpload" />
+                                </div>
+                                <div>
+                                <label for="file" class="control-label"><a href="#" class="info" data-plugin-tooltip="tooltip" data-toggle="tooltip" data-placement="top" title="CSV, XLS, XLXS, and XML file formats are supported"><i class="fa fa-question-circle"></i></a></label> <label class="control-label">Upload from OneDrive </label>&nbsp; <input type="checkbox" id="onedrive" value="1" />
+                                </div>
+                                </div> *@
+                                    <div class="col-xxl-3">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="placeholderInput" class="form-label">Upload File <span class="text-danger">*</span></label>
+                                                <div class="clearfix"></div>
+                                                <input type="file" id="fileUpload" class="fileUpload" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="file" class="control-label">
+                                                    <a href="#" class="info" data-plugin-tooltip="tooltip" data-toggle="tooltip" data-placement="top" title="CSV, XLS, XLXS, and XML file formats are supported">
+                                                        <i class="fa fa-question-circle"></i>
+                                                    </a>
+                                                </label>
+                                                <div class="clearfix"></div>
+                                                <label class="control-label">Upload from OneDrive </label>&nbsp;
+                                                <input type="checkbox" id="onedrive" value="1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="MapData" class="mt-2">
+    </div>
+
+    <div id="DifferentQurterDataDiv" class="hide table-responsive">
+        <div class="card">
+            <div class="card-header bg-info rounded-0 card-header-ta-blue">
+                <h4 class="mb-0 text-white fs-4">Prior Records</h4>
+            </div>
+            <div class="card-body">
+                <table id="DifferentQurterDataTable" class="table display table-bordered table-striped no-wrap bg-white w-100">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Workday</th>
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div>
+                    <button class="btn btn-primary float-end" onclick="uploadDifferentQuarterData()">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/scripts/Upload.js"></script>
+    <script src="~/Scripts/fileuploadinput.js"></script>
+    <script src="https://js.live.net/v7.0/OneDrive.js"></script>
+}
+

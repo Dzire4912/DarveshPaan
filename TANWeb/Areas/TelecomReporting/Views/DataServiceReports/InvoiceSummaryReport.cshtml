@@ -1,0 +1,111 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Invoice Summary Report</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Invoice Summary Report</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filter</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <div class="row gy-3 custom-select-arrow">
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 col-sm-12">
+                                        <div class="overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Facility</label>
+                                            <div class="clearfix"></div>
+                                            <select id="facilityLocationId" class="select2">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 col-sm-12">
+                                        <div class="overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Facility</label>
+                                            <div class="clearfix"></div>
+                                            <input class="form-control" type="text" />
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 col-sm-12">
+                                        <div class="overlap-input-field">
+                                            <label for="placeholderInput" class="form-label">Facility</label>
+                                            <div class="clearfix"></div>
+                                            <input type="date" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-4 col-xl-4 col-md-6 d-flex align-items-end">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button id="btnSearch" onclick="applyFilters()" type="button" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button id="btnClear" type="button" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12">
+            <div class="card rounded-0">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table display table-bordered table-striped no-wrap w-100" id="dataServiceTable">
+                            <thead>
+                                <tr>
+                                    <th>Account Number</th>
+                                    <th>Invoice Number</th>
+                                    <th>Invoice Due Date</th>
+                                    <th>Billing Date</th>
+                                    <th>Total Amount Due</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                <td>Facility Id</td>
+                                <td>Facility Name</td>
+                                <td>Organization Name</td>
+                                <td>Application Names</td>
+                                <td>Status</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

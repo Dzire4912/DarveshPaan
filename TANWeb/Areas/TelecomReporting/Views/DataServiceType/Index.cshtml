@@ -1,0 +1,64 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+}
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12 align-self-center">
+            <h4 class="page-title">Data Service Type</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Data Service Type</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-12 align-self-center mb-2">
+            <div class="d-flex no-block justify-content-lg-end justify-content-md-end justify-content-sm-start align-items-center">
+                <button type="button" id="btnAddDataService" class="btn waves-effect waves-light btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#DataServiceModal">
+                    <i class="ri-add-fill me-1 align-bottom"></i>
+                    New Data Service Type
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid main-content-height pt-0">
+    <div class="row">
+        <div class="col-xl-12">
+            @Html.Partial("GetDataServiceType")
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DataServiceModal" tabindex="-1" aria-labelledby="DataServiceModalLabel" aria-hidden="true">
+    @Html.Partial("DataServiceType")
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_CommonScriptsPartial" />
+        <script src="~/scripts/telecom/DataServiceType.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+            });
+            $("#btnAddDataService").click(function () {
+                clearDataServiceTypeData();
+                $("#btnSaveDataService").show();
+                $("#btnUpdateDataService").hide();
+            });
+            $("#btnUpdateDataService").click(function (e) {
+                updateDataServiceType();
+            });
+            $('#btnSaveDataService').click(function (e) {
+                // if (validateDataServiceTypeForm()) {
+                    // clearDataServiceTypeData();
+                    saveDataServiceType();
+                // }
+            });
+        </script>
+    }
+   }

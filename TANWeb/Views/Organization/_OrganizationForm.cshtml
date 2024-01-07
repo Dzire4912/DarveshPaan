@@ -1,0 +1,134 @@
+﻿@model TAN.DomainModels.ViewModels.OrganizationViewModel
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+</head>
+
+<div class="page-content">
+    <div class="container-fluid">
+        <form id="addOrganizationForm" method="Post" asp-antiforgery="true">
+            <div class="form-group mb-3">
+                <input type="hidden" asp-for="OrganizationID" class="form-control" id="organizationID" />
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="OrganizationName" class="control-label">Organization Name<span class="text-danger">*</span></label>
+                        <input asp-for="OrganizationName" class="form-control" id="organizationName" onkeypress="return isAlphaNumeric(event)" onblur="validateInputOnBlur(this)" />
+                        <span asp-validation-for="OrganizationName" class="text-danger errormsg" id="organizationName_Error"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="OrganizationEmail" class="control-label">Organization Email<span class="text-danger">*</span></label>
+                        <input asp-for="OrganizationEmail" class="form-control" id="organizationEmail" onfocusout="checkForUniqueEmail()" />
+                        <span asp-validation-for="OrganizationEmail" class="text-danger errormsg" id="organizationEmail_Error"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="PrimaryPhone" class="control-label">Primary Phone<span class="text-danger">*</span></label>
+                        <input asp-for="PrimaryPhone" class="form-control" id="organizationPrimaryPhone" onkeydown="allowOnlyDigits(event)" />
+                        <span asp-validation-for="PrimaryPhone" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="SecondaryPhone" class="control-label"></label>
+                        <input asp-for="SecondaryPhone" class="form-control" id="organizationSecondaryPhone" onkeydown="allowOnlyDigits(event)" />
+                        <span asp-validation-for="SecondaryPhone" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="Address1" class="control-label">Address 1<span class="text-danger">*</span></label>
+                        <input asp-for="Address1" class="form-control" id="organizationAddress1" onkeydown="restrictSpecialChars(event)" />
+                        <span asp-validation-for="Address1" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="Address2" class="control-label"></label>
+                        <input asp-for="Address2" class="form-control" id="organizationAddress2" onkeydown="restrictSpecialChars(event)" />
+                        <span asp-validation-for="Address2" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="City" class="control-label">City<span class="text-danger">*</span></label>
+                        <input asp-for="City" class="form-control" id="organizationCity" onkeydown="restrictInput(event)" />
+                        <span asp-validation-for="City" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6 custom-select-arrow">
+                    <div id="selectDiv" class="form-group mb-2 overlap-input-field">
+                        <label asp-for="State" class="control-label">State<span class="text-danger">*</span></label>
+                        <select asp-for=State id="organizationState" class="select2" asp-items="@(new SelectList(Model.StateList, "StateCode", "StateName"))">
+                        </select>
+                        <span asp-validation-for="State" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-2">
+                        <label asp-for="ZipCode" class="control-label">Zip Code<span class="text-danger">*</span></label>
+                        <input asp-for="ZipCode" class="form-control" id="organizationZipCode" onkeydown="allowOnlyDigits(event)" />
+                        <span asp-validation-for="ZipCode" class="text-danger errormsg"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="bandwidthAccessChkBox">Is this Organization registered with bandwidth.com and utilizing voice services?</label>
+                    <input type="checkbox" id="bandwidthAccessChkBox" name="bandwidthAccessChkBox" value="isChecked">
+                </div>
+                <div class="col-lg-6">
+                    <div id="ServiceSelectionTypeDiv" style="display: none;">
+                        <div id="ServiceTypeDiv" class="form-group mb-2 organization-service-type">
+                            <label asp-for="ServiceType" class="control-label">Service Type<span class="text-danger">*</span></label>
+                            <select asp-for="ServiceType" id="ServiceSelectBox" class="select2" multiple onchange="getMasterAccountId()">
+                                <option value="0">Voice Service</option>
+                                <option value="1">Data Service</option>
+                            </select>
+                            <span asp-validation-for="ServiceType" class="text-danger errormsg"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <input type="hidden" class="form-control" id="organizationMasterAccountId" />
+            </div>
+            <div id="ServiceSelectionDiv" style="display: none;">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group mb-2">
+                            <label asp-for="MasterAccountId" class="control-label">Master Account Name<span class="text-danger">*</span></label>
+                            <input asp-for="MasterAccountId" class="form-control" id="organizationMasterAccountName" readonly />
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group mb-2">
+                            <label asp-for="SubAccountId" class="control-label">Sub-Account Id<span class="text-danger">*</span></label>
+                            <input asp-for="SubAccountId" class="form-control" id="organizationSubAccountId" onfocusout="checkForSubAccoutId()"/>
+                            <span asp-validation-for="SubAccountId" class="text-danger errormsg" id="organizationSubAccountId_Error"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer py-0 pe-0 pt-0">
+                <button type="submit" class="btn waves-effect waves-light btn-info" id="btnSaveOrganization" style="z-index:0">Save</button>
+                <button type="submit" class="btn waves-effect waves-light btn-info" style="display:none;" id="btnUpdateOrganization">Update</button>
+                <button type="button" class="btn btn-secondary" id="btnClose" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+

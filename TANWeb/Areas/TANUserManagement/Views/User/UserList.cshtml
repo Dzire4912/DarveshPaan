@@ -1,0 +1,513 @@
+﻿@using TAN.DomainModels.Entities;
+@model TAN.DomainModels.Entities.UserViewModel;
+@using Microsoft.AspNetCore.Identity;
+@*@model IEnumerable<AspNetUser>*@
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@{
+    var mylayout = Context.Session.GetString("SelectedApp");
+    if (mylayout != "Inventory" && mylayout != "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+    else if (mylayout != "Inventory" || mylayout == "Reporting")
+    {
+        Layout = "~/Views/Shared/_LayoutTelecom.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutInventory.cshtml";
+    }
+}
+
+
+<div class="page-breadcrumb pt-2">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">User List</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
+                        @if (@ViewBag.fromFacility == "true")
+                        {
+                            <li class="breadcrumb-item"><a href="/Facility/Index">Facility</a></li>
+                        }
+                        <li class="breadcrumb-item active"><a asp-controller="Users" asp-action="Index">@ViewData["Title"]</a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-7 align-self-center">
+            <div class="d-flex no-block justify-content-end align-items-center">
+                @if ((AuthorizationService.AuthorizeAsync(User,
+                Permissions.UserManagement.PBJSnapCreate)).Result.Succeeded)
+                {
+                    <button id="btnAddUser" class="btn waves-effect waves-light btn-secondary addMembers-modal" onclick="GetApps()"
+                            data-bs-toggle="modal" data-bs-target="#addmemberModal">
+                        <i class="ri-add-fill me-1 align-bottom"></i> Add User
+                    </button>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid main-content-height pt-0">
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="accordion accordion-flush border-bottom" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed fs-4 rounded-0 d-flex py-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne"
+                                aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                            <i class="ri-filter-line pe-1"></i> <span class="pt-1">Filters</span>
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingOne"
+                         data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body bg-light">
+                            <div class="live-preview">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-6 col-sm-12 col-lg-3">
+                                        <label for="placeholderInput" class="form-label">Search</label>
+                                        <div class="search-box">
+                                            <input type="text" class="form-control search lh-base" id="UserName" placeholder="Search By Username">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                        <label for="placeholderInput" class="form-label">Role</label>
+                                        <select class="form-select select2" id="RoleName" asp-items="@(new SelectList(Model.RoleList, "Value", "Text"))">
+                                            <option value="" selected>Select Role</option>
+                                        </select>
+                                    </div>
+                                    @if (ViewBag.currentUserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                    {
+                                        <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                            <label for="placeholderInput" class="form-label">Organizations</label>
+                                            <select class="form-select select2" id="OrgName" asp-items="@(new SelectList(Model.OrgList, "Value", "Text"))" onchange="GetOrgFacilities()">
+                                                <option value="" selected>Select Organization</option>
+                                            </select>
+                                        </div>
+                                    }
+                                    @if (ViewBag.currentUserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                    {
+                                        <div class="col-md-6 col-sm-12 col-lg-3 overlap-input-field custom-select-arrow">
+                                            <label for="placeholderInput" class="form-label">Facility Name</label>
+                                            <select class="form-select select2" id="FacilityNameFilter" asp-items="@(new SelectList(Model.FacilityList, "Value", "Text"))">
+                                                <option value="" selected>Select Facility Name</option>
+                                            </select>
+                                        </div>
+                                    }
+                                    <div class="col-sm-6 col-md-12 col-lg-4 col-xl-2 me-3 btn-width">
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            <button type="button" onclick="searchUser()" class="btn waves-effect waves-light btn-info me-2"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Apply Filters</button>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button type="button" onclick="resetUserFilter()" class="btn btn-secondary d-flex justify-content-center align-items-center"> <i class="ri-refresh-line me-1"></i> Reset</button>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="table-responsive">
+                                <table id="PBJEmployeeList" class="table display table-bordered table-striped no-wrap user-table-td">
+                                    <thead>
+                                        <tr>
+                                            <th class="border-bottom border-top">
+                                                User
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Email
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Role
+                                            </th>
+                                            <th class="border-bottom border-top default-app">
+                                                Default App
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Status
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                User Type
+                                            </th>
+                                            <th class="border-bottom border-top">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in Model.users)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-sm">
+                                                            <a>
+                                                                @user.FirstName  @user.LastName
+                                                            </a>
+                                                            <br>
+
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a>
+                                                        @user.UserEmail
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    @user.Role
+                                                </td>
+                                                <td>
+                                                    @user.DefaultAppName
+                                                </td>
+                                                <td>
+                                                    @if (Convert.ToBoolean(user.ActiveStatus) == true)
+                                                    {
+                                                        <span class="badge bg-light-success text-success fw-normal">Active</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-danger">In Active</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (user.UserType == Convert.ToInt32(UserTypes.Thinkanew))
+                                                    {
+                                                        <a class="btn-circle btn bg-success text-white btn-circle-custom" data-bs-toggle='tooltip' data-bs-placement='top' title='Think Anew'>T</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a class="btn-circle btn bg-info text-white btn-circle-custom" data-bs-toggle='tooltip' data-bs-placement='top' title='Customer'>C</a>
+                                                    }
+                                                </td>
+                                                <td>
+
+                                                    <span>
+                                                        <a asp-area="TANUserManagement"
+                                                           asp-controller="UserRoles" asp-action="Index"
+                                                           asp-route-userId="@user.Id" data-bs-toggle='tooltip' data-bs-placement='top' title='Manage Roles'>
+                                                            <i class="fas fa-wrench me-2 fs-4"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span>
+                                                        <a asp-area="TANUserManagement"
+                                                           asp-controller="User" asp-action="EditUser"
+                                                           asp-route-userId="@user.Id" data-bs-toggle='tooltip' data-bs-placement='top' title='Edit'>
+                                                            <i class="fas fa-edit me-2 fs-4"></i>
+                                                        </a>
+                                                    </span>
+                                                    @if (Convert.ToBoolean(user.ActiveStatus) == true)
+                                                    {
+                                                        <span>
+                                                            <a
+                                                               onclick="updateActiveStatus('@user.Id','0')"
+                                                               data-bs-toggle='tooltip' data-bs-placement='top' title='Active'>
+                                                                <i class="fas fa-toggle-on me-2 text-success fs-4"></i>
+                                                            </a>
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>
+                                                            <a
+                                                               onclick="updateActiveStatus('@user.Id','1')"
+                                                               data-bs-toggle='tooltip' data-bs-placement='top' title='In Active'>
+
+                                                                    <i class="fas fa-toggle-off me-2 text-muted fs-4"></i>
+                                                                </a>
+                                                                  </span>
+                                                                }
+                                                    @if ((AuthorizationService.AuthorizeAsync(User,
+                                                      Permissions.UserManagement.PBJSnapEdit)).Result.Succeeded)
+                                                    {
+                                                        <span>
+                                                            <a
+                                                            onclick="ResendMail('@user.Id')"
+                                                            data-bs-toggle='tooltip' data-bs-placement='top' title='Resend Mail'>
+                                                                <i class="fas fa-paper-plane me-2 text-info fs-4"></i>
+                                                            </a>
+                                                        </span>
+                                                    }
+                                                </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<div class="modal fade" id="addmemberModal" tabindex="-1" aria-labelledby="exampleModalgridLabel" aria-modal="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h4 class="modal-title" id="myModalLabel">Add User</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="AddADUserInfo" asp-antiforgery="true" asp-controller="User" id="AddADUserInform">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div>
+                                <input type="hidden" id="userId" value="" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input onclick="ClearSpan()" type="text" class="form-control" id="txtfName" name="fName" placeholder="Enter First Name" onkeydown="restrictInput(event)">
+                                <span id="sptxtfName" class="text-danger validation"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group mb-2">
+                                <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span> </label>
+                                <input onclick="ClearSpan()" type="text" class="form-control" id="txtlName" name="lname" placeholder="Enter Last Name" onkeydown="restrictInput(event)">
+                                <span id="sptxtlName" class="text-danger validation"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group  mb-2">
+                                <label for="emailInput" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input onclick="ClearSpan()" type="email" class="form-control" id="txtEmail" name="email" placeholder="Enter Email" onfocusout="checkForUniqueEmail()">
+                                <span id="sptxtEmail" class="text-danger validation"></span>
+                            </div>
+                            <input id="currentType" name="cuType" value="@ViewBag.currentUserType" hidden />
+                            <input id="currentOrg" name="cuOrg" value="@ViewBag.currentUserOrg" hidden />
+                        </div>
+                        @if (ViewBag.currentUserType == Convert.ToInt32(UserTypes.Thinkanew))
+                        {
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                    <label for="usertype" class="form-label">User Type <span class="text-danger">*</span></label>
+                                    <select class="select2" id="userType" onchange="FixType()" name="UserType" asp-items="@(new SelectList(Model.UserTypesList, "Value", "Text"))">
+                                        <option value="" selected>Select Type</option>
+                                    </select>
+                                    <span id="spuserType" class="text-danger validation"></span>
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                    <label for="usertype" class="form-label">User Type <span class="text-danger">*</span></label>
+                                    <select disabled class="select2" id="userType" onchange="FixType()" name="UserType" asp-items="@(new SelectList(Model.UserTypesList, "Value", "Text"))">
+                                        <option value="" selected>Select Type</option>
+                                    </select>
+                                    <span id="spuserType" class="text-danger validation"></span>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                    <div id="ThinkAnewTypeFilter">
+                        <div class="row">
+                            @if (ViewBag.currentUserType == Convert.ToInt32(UserTypes.Thinkanew))
+                            {
+                                <div class="col-lg-12 col-sm-12">
+                                    <div id="Roles" class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                        <label for="roleName" class="form-label">Role <span class="text-danger">*</span></label>
+                                        <select class="select2" id="roleName" name="roleName" asp-items="@(new SelectList(Model.PopUpRoles, "Value", "Text"))" placeholder="Select an role">
+                                            <option value="" selected>Select Role Name</option>
+                                        </select>
+                                        <span id="sproleName" class="text-danger validation"></span>
+                                    </div>
+                                </div>
+                            }
+                            @* <div class="col-lg-6 col-sm-12">
+
+                            <div id="ddlapp" class="form-group mb-2 overlap-input-field">
+                            <label for="appName" class="form-label">Applications <span class="text-danger">*</span></label>
+                            <select class="select2" onchange="GetApps()" id="appName" name="appName" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))" placeholder="Select an application">
+                            <option value="" selected>Select App Name</option>
+                            </select>
+                            <span id="spappName" class="text-danger validation"></span>
+                            </div>
+                            </div>*@
+                        </div>
+                    </div>
+
+                    <div id="TypeFilter">
+                        <div class="row">
+                            @if (ViewBag.currentUserType == Convert.ToInt32(UserTypes.Thinkanew))
+                            {
+                                <div class="col-lg-6">
+                                    <div id="Orgs" class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                        <label for="emailInput" class="form-label">Organization <span class="text-danger">*</span></label>
+                                        <select class="select2" id="organizationName" onchange="GetFacility()" name="defaultApp" asp-items="@(new SelectList(Model.OrgList, "Value", "Text"))" placeholder="Select an organization">
+                                            <option value="" selected>Select Organization</option>
+                                        </select>
+                                        <span id="sporanizationName" class="text-danger validation"></span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-lg-6">
+                                    <div id="Orgs" class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                        <label for="emailInput" class="form-label">Organization <span class="text-danger">*</span></label>
+                                        <select disabled class="select2" id="organizationName" onchange="GetFacility()" name="defaultApp" asp-items="@(new SelectList(Model.OrgList, "Value", "Text"))" placeholder="Select an organization">
+                                            <option value="" selected>Select Organization</option>
+                                        </select>
+                                        <span id="sporanizationName" class="text-danger validation"></span>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-lg-6">
+
+                                <div id="Facilities" class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                    <label for="emailInput" class="form-label">Facility <span class="text-danger">*</span></label>
+                                    <select class="select2" onchange="GetFacilityApplication()" multiple id="facilityName" name="apps[]" asp-items="@(new SelectList(Model.FacilityList, "Value", "Text"))">
+                                    </select>
+                                    <span id="spfacilityName" class="text-danger validation"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-group mb-2 overlap-input-field custom-select-arrow">
+                                <label for="emailInput" class="form-label">Default Application <span class="text-danger">*</span></label>
+                                <select class="select2" id="defApp" name="defApp" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                                </select>
+                                <span id="spdefapplication" class="text-danger validation"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer pt-0">
+                <button type="submit" onclick="addUser()" class="btn waves-effect waves-light btn-info">Add</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="refreshUserModel()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--end modal-->
+@section PageScripts {
+    @{
+        <partial name="_ValidationScriptsPartial"></partial>
+        <script>
+            var AddUserButtonInfo = '@ViewBag.AddUserId';
+            $(document).ready(function () {
+
+                $('#addmemberModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $('#PBJEmployeeList').dataTable().fnDestroy();
+                $('#PBJEmployeeList').dataTable({
+                    order: [],
+                    pagingType: "full_numbers",
+                    language: {
+                        paginate: {
+                            first: '<i class="fa fa-angle-double-left"></i>',
+                            previous: '<i class="fa fa-angle-left"></i>',
+                            next: '<i class="fa fa-angle-right"></i>',
+                            last: '<i class="fa fa-angle-double-right"></i>',
+                        }
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: [5] }
+                    ]
+                });
+
+                if (AddUserButtonInfo) {
+                    loadAddUserModalPopUp();
+                }
+                $('#organizationName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#facilityName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#defApp').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#userType').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#roleName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+                $('#appName').on('select2:select', function () {
+                    var errorId = $(this).data('error-id');
+                    var errorSpan = $('#' + this.id).nextAll('span.text-danger:first');
+                    errorSpan.text('');
+                });
+
+                $('#ThinkAnewTypeFilter').hide();
+                $('#TypeFilter').hide();
+                if (@ViewBag.currentUserType != 1) {
+                    $('#TypeFilter').show();
+                    $('#userType').val('2');
+                    $('#userType').trigger('change');
+
+                    $('#organizationName').val(@ViewBag.currentUserOrg);
+                    $('#organizationName').trigger('change');
+
+
+                }
+            });
+
+        </script>
+
+
+
+    }
+
+ }
+
+
+

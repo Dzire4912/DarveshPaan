@@ -1,0 +1,18 @@
+[
+  {
+    "outputFile": "wwwroot/css/ta-style.css",
+    "inputFile": "wwwroot/scss/application/ta/ta-style.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/pbjsnap-style.css",
+    "inputFile": "wwwroot/scss/application/pbjsnap/pbjsnap-style.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/inventory-style.css",
+    "inputFile": "wwwroot/scss/application/inventory/inventory-style.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/telecom-style.css",
+    "inputFile": "wwwroot/scss/application/telecom/telecom-style.scss"
+  }
+]

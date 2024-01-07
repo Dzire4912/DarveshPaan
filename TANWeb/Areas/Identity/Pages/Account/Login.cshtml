@@ -1,0 +1,146 @@
+﻿@page "/login"
+@model LoginModel
+@using TAN.DomainModels.Helpers;
+@using AspNetCore.ReCaptcha;
+ 
+@inject Microsoft.Extensions.Options.IOptions<TANWeb.Models.ReCaptcha> _reCaptcha;
+@{
+    ViewData["Title"] = "Log in";
+}
+@{
+    var buildVersion = BuildVersion.version;
+    var description = EnumHelper.GetEnumDescription(buildVersion);
+}
+
+<div class="row auth-wrapper gx-0">
+    <div class="col-lg-6 col-xl-6 bg-info auth-box-2 on-sidebar leftbar-info">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="row justify-content-center text-center">
+                <div class="col-md-12 col-lg-11 col-xl-9">
+
+                    <h2 class="text-white pt-3 fw-light">
+                        @*<span class="font-medium">Long term care </span> and <span class="font-medium"> Senior living's trusted IT solutions company</span>.*@
+                        Long-term Care and Senior Living’s
+                        Trusted IT Solutions Company
+                    </h2>
+                    <p class="text-white fs-5 mb-2 mt-3 pt-2">
+                        Welcome to the Think Anew Customer Center, your
+                        home for Think Anew Services
+                    </p>
+
+                </div>
+                <div class="col-md-12 col-lg-10 col-xl-9 px-lg-0 mt-2">
+                    <div class="left-image m-auto">
+                        <img src="../../assets/images/login_image.png" class="p-2" alt="logo" />
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-xl-6 d-flex align-items-center justify-content-center">
+        <div class="row justify-content-center w-100 mt-lg-0">
+            <div class="col-lg-8 col-xl-8 col-md-8">
+                <div class="card" id="loginform">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="d-flex justify-content-center align-items-end logo-wrapper m-auto mb-5">
+                                    <img src="../../assets/images/logo1.png" alt="logo" />
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="text-center">Welcome to our Customer Center</h4>
+                        <p class="text-center mt-0 mb-0">
+                            Sign in
+                        </p>
+                        <form class="form-horizontal pt-3 needs-validation"
+                              novalidate id="account" method="post">
+                            <input type="hidden" id="GoogleCaptcha" asp-for="Input.Token" value="" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger" id="ErrorText" role="alert"></div>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            <div class="form-group mb-3">
+                                <input asp-for="Input.Email" id="txtEmail" class="form-control form-input-bg p-3 inputFocus rounded-0" autocomplete="username" aria-required="true" placeholder="Email">
+                                <span class="focus-border">
+                                    <i></i>
+                                </span>
+                            </div>
+
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            <div class="form-group mb-2">
+                                <input asp-for="Input.Password" id="txtPassword" class="psw form-control form-input-bg p-3 inputFocus rounded-0 " autocomplete="" aria-required="true" placeholder="Password">
+                                <span class="focus-border">
+                                    <i></i>
+                                </span>
+                                <i class="ri-eye-line showPsw fs-4 hidepswd"></i>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="ms-auto">
+                                    <a id="forgot-password" asp-page="./ForgotPassword" class="mt-3">Forgot Password?</a>
+                                </div>
+                            </div>
+
+                            @*<span asp-validation-for="Input.Password" class="text-danger"></span>*@
+                            <div class="form-group mt-3 m-auto">
+                                <div id="reCapthaDivId" class="g-recaptcha"></div>
+                            </div>
+                            <div class="d-flex align-items-stretch button-group mt-0">
+                                <button type="submit" onclick="submitSignIn()" id="login-submit" class="btn waves-effect waves-light btn-info w-100 me-0">
+
+                                    <span class="d-none " id="SpanSpinner" role="status" aria-hidden="true"></span>
+                                    Sign In
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="text-center mb-3">@description</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+            async defer></script>
+    <script>
+
+        function submitSignIn() {
+            if ($('#txtEmail').val().trim() != '' && $('#txtPassword').val().trim() != '') {
+                $('#SpanSpinner').addClass('spinner-border');
+                $('#SpanSpinner').addClass('spinner-border-sm');
+            }
+        }
+
+     
+        $(".showPsw").on('click', function () {
+            var passwordField = $("#txtPassword");
+            if (passwordField.attr("type") === "password") {
+                passwordField.attr("type", "text");
+                $(this).removeClass("hidepswd").addClass("showpswd");
+            } else {
+                passwordField.attr("type", "password");
+                $(this).removeClass("showpswd").addClass("hidepswd");
+            }
+        });
+
+
+        var onloadCallback = function () { 
+            grecaptcha.render('reCapthaDivId', {
+                'sitekey': '@_reCaptcha.Value.SiteKey',
+                'callback': function (response) {
+                    $('#GoogleCaptcha').val(response);
+                }
+            });
+        };
+
+    </script>
+
+}

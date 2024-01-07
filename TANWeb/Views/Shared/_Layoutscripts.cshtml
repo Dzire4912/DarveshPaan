@@ -1,0 +1,248 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@*<environment include="development">
+    <script src="~/scripts/minifiedjs/customjs.min.js"></script>
+</environment>
+<environment exclude="development">
+    <script src="~/scripts/minifiedjs/customjs.min.js"></script>
+</environment>*@
+<script src="~/Scripts/General.js"></script>
+<script src="~/Scripts/UserList.js"></script>
+<script src="~/Scripts/Role.js"></script>
+<script src="~/Scripts/userRole.js"></script>
+<script src="~/scripts/labourfilemover.js"></script>
+<script type="text/javascript">
+    var urls = {
+        Role: {
+            UpdateRole: '@Url.Action("UpdateRole", "Roles",new{Area="TANUserManagement"})',
+            DeleteRole: '@Url.Action("DeleteRole", "Roles")',
+            GetRole: '@Url.Action("GetRoleDetails", "Roles",new{Area="TANUserManagement"})',
+            sub: '@Url.Action("Index","Home",new{Area="TANUserManagement"})',
+            index: '@Url.Action("Index","Roles",new {Area="TANUserManagement"})',
+            GetTANRoleList: '@Url.Action("GetTanRoles","Roles",new{Area="TANUserManagement"})'
+        },
+        UserManagement: {
+            SearchUserData: '@Url.Action("UserList","User",new{Area="TANUserManagement"})',
+            UpdateActiveStatus: '@Url.Action("UpdateActiveStatus","User",new{Area="TANUserManagement"})',
+            SearchOrgUserData: '@Url.Action("OrganizationUserList","User",new{Area="TANUserManagement"})',
+            SearchADUserData: '@Url.Action("SearchADUserInfo","User",new{Area="TANUserManagement"})',
+            AddTANUserData: '@Url.Action("AddTANUserInfo","User",new{Area="TANUserManagement"})',
+            AddOrganizationUserData: '@Url.Action("AddOrganizationUserData","User",new{Area="TANUserManagement"})',
+            UpdateUser: '@Url.Action("UpdateUser","User",new{Area="TANUserManagement"})',
+            FaciltyList: '@Url.Action("GetFacilityList","User",new{Area="TANUserManagement"})',
+            FaciltyAppList: '@Url.Action("GetFacilityApplicationList","User",new{Area="TANUserManagement"})',
+            GetAppList: '@Url.Action("GetApplication","User",new{Area="TANUserManagement"})',
+            GetroleList: '@Url.Action("GetRoles","User",new{Area="TANUserManagement"})',
+            CheckForUniqueEmail: '@Url.Action("CheckForUniqueEmail","User",new{Area="TANUserManagement"})',
+            GetValues: '@Url.Action("GetValues","User",new{Area="TANUserManagement"})',
+            ResendUrl: '@Url.Action("Resend","User",new{Area="TANUserManagement"})',
+        },
+        UsrRoles: {
+            SearchUserData: '@Url.Action("Index","UserRoles",new{Area="TANUserManagement"})',
+            GetTANRoleList: '@Url.Action("GetTanRoles","UserRoles",new{Area="TANUserManagement"})'
+        },
+
+        Permission: {
+            GetPermission: '@Url.Action("Index", "Permission")',
+            UpdatePermission: '@Url.Action("Update", "Permission")'
+        },
+        OrganizationManagement:
+        {
+            DeleteOrganization: '@Url.Action("DeleteOrganization","Organization")',
+            EditOrganization: '@Url.Action("EditOrganization","Organization")',
+            SaveOrganization: '@Url.Action("SaveOrganization","Organization")',
+            UpdateOrganization: '@Url.Action("UpdateOrganization","Organization")',
+            GetOrganizationsList: '@Url.Action("GetOrganizationsList","Organization")',
+            CheckForEmailId: '@Url.Action("CheckForValidEmail","Organization")',
+            CheckForOrganizationName: '@Url.Action("CheckForValidName","Organization")',
+            GetMasterAccountDetails: '@Url.Action("GetMasterAccountDetails","Organization")',
+            CheckForSubAccountId: '@Url.Action("CheckForSubAccountId","Organization")'
+        },
+        FacilityManagement:
+        {
+            SaveFacility: '@Url.Action("SaveFacility","Facility",new{Area=""})',
+            DeleteFacility: '@Url.Action("DeleteFacility","Facility",new{Area=""})',
+            DeleteByFacilityID: '@Url.Action("DeleteByFid","KronosHome",new{Area="LabourFileMover"})',
+            EditFacility: '@Url.Action("EditFacility","Facility")',
+            UpdateFacility: '@Url.Action("UpdateFacility","Facility")',
+            GetFacilitiesList: '@Url.Action("GetFacilities","Facility")',
+            CheckForFacilityName: '@Url.Action("CheckForValidName","Facility",new{Area=""})',
+            CheckForFacilityId: '@Url.Action("CheckForUniqueId","Facility",new{Area=""})',
+            GetValues: '@Url.Action("GetValues","Facility")',
+            GetOrganizationServiceDetails: '@Url.Action("GetOrganizationServiceDetails","Facility")',
+            GetOrganizationUserInfo: '@Url.Action("GetOrganizationUserInfo","Facility")'
+        },
+        AgencyManagement:
+        {
+            AddAgency: '@Url.Action("AddAgency","Agency")',
+            GetAllAgenciesList: '@Url.Action("GetAllAgencies","Agency")',
+            EditAgency: '@Url.Action("GetAgencyDetail","Agency")',
+            UpdateAgency: '@Url.Action("UpdateAgency","Agency")',
+            DeleteAgency: '@Url.Action("DeleteAgency","Agency")',
+            CheckForAgencyName: '@Url.Action("CheckForValidName","Agency")',
+            CheckForAgencyId: '@Url.Action("CheckForUniqueId","Agency")',
+            GetAgencyIdListByFacilityName: '@Url.Action("GetAgencyIdListByFacilityName","Agency")',
+            GetLoggedInUserInfo: '@Url.Action("GetLoggedInUserInfo","Agency")',
+            GetOrganizationUserInfo: '@Url.Action("GetOrganizationUserInfo","Agency")',
+        },
+        SubmissionHistoryManagement:
+        {
+            GetFacilities: '@Url.Action("GetFacilities","History")',
+            GetSubmissions: '@Url.Action("GetSubmissionHistory","History")',
+            DeleteSubmision: '@Url.Action("DeleteSubmissionHistory","History")',
+            EditStatus: '@Url.Action("GetFileDetails","History")',
+            UpdateSubmissionData: '@Url.Action("UpdateSubmissionData","History")',
+            DownloadFile: '@Url.Action("DownloadFile","History")'
+        },
+        StorageManagement:
+        {
+            UploadFile: '@Url.Action("UploadFile","Storage")',
+            GetAllFiles: '@Url.Action("ListFiles","Storage")',
+            DownLoadFile: '@Url.Action("DownLoadFile","Storage")',
+            DeleteFile: '@Url.Action("DeleteFile","Storage")',
+        },
+        Backout:
+        {
+            GetUploadFileDetails: '@Url.Action("GetUploadFileDetails","BackoutUploadFile",new{Area="PBJSnap"})',
+            BackOutAllData: '@Url.Action("BackOutAllData","BackoutUploadFile",new{Area="PBJSnap"})',
+            GetFileErrorData: '@Url.Action("GetFileErrorData","BackoutUploadFile",new{Area="PBJSnap"})',
+            GetErrorRowData: '@Url.Action("GetErrorRowData","BackoutUploadFile",new{Area="PBJSnap"})',
+            UpdateErrorRowData: '@Url.Action("UpdateErrorRowData","BackoutUploadFile",new{Area="PBJSnap"})',
+            DeleteInvalidRecord: '@Url.Action("DeleteInvalidRecord","BackoutUploadFile",new{Area="PBJSnap"})',
+            DeleteErrorRowData: '@Url.Action("DeleteErrorRowData","BackoutUploadFile",new{Area="PBJSnap"})',
+            ListValidationErrorByFileId: '@Url.Action("ListValidationErrorByFileId","BackoutUploadFile",new{Area="PBJSnap"})',
+            GetAllFileNameByFacility: '@Url.Action("GetAllFileNameByFacility","BackoutUploadFile",new{Area="PBJSnap"})',
+            GetFileValidData: '@Url.Action("GetFileValidData","BackoutUploadFile",new{Area="PBJSnap"})',
+            ExportInvalidFileErrorDataToCsv: '@Url.Action("ExportInvalidFileErrorDataToCsv","BackoutUploadFile",new{Area="PBJSnap"})',
+            ExportValidFileDataToCsv: '@Url.Action("ExportValidFileDataToCsv","BackoutUploadFile",new{Area="PBJSnap"})',
+            GetFileNameByFacility: '@Url.Action("GetFileNameByFacility","BackoutUploadFile",new{Area="PBJSnap"})',
+            ExportInvalidFileErrorDynamicDataToCsv: '@Url.Action("ExportInvalidFileErrorDynamicDataToCsv","BackoutUploadFile",new{Area="PBJSnap"})',
+            GetFacilityName: '@Url.Action("GetFacilityName","BackoutUploadFile",new{Area="PBJSnap"})'
+        },
+        Employee:
+        {
+            EmployeeList: '@Url.Action("EmployeeList","EmployeeMaster",new{Area="PBJSnap"})',
+            SaveEmployeeDetail: '@Url.Action("SaveEmployeeDetail","EmployeeMaster",new{Area="PBJSnap"})'
+        },
+        Upload:
+        {
+            UploadFile: '@Url.Action("UploadFile","Upload",new{Area="PBJSnap"})',
+            MappingData: '@Url.Action("MappingData","Upload",new{Area="PBJSnap"})',
+            InsertDifferntQuarterData: '@Url.Action("InsertDifferntQuarterData","Upload",new{Area="PBJSnap"})'
+        },
+        Submit:
+        {
+            GenerateXMLFile: '@Url.Action("GenerateXMLFile","Submit",new{Area="PBJSnap"})'
+        },
+        PayTypeJobTitle:
+        {
+            GetPayCode: '@Url.Action("GetPayCode","PayTypeJobTitle",new{Area="PBJSnap"})',
+            GetJobTitle: '@Url.Action("GetJobTitle","PayTypeJobTitle",new{Area="PBJSnap"})'
+        },
+        Review:
+        {
+            Index: '@Url.Action("Index","Review",new{Area="PBJSnap"})',
+            AddCencus: '@Url.Action("AddCencus","Review",new{Area="PBJSnap"})',
+            DeleteCencus: '@Url.Action("DeleteCencus","Review",new{Area="PBJSnap"})',
+            EditCencus: '@Url.Action("EditCencus","Review",new{Area="PBJSnap"})',
+            GetCensus: '@Url.Action("GetCensus","Review",new{Area="PBJSnap"})',
+            GetStaffingData: '@Url.Action("GetStaffingData","Review",new{Area="PBJSnap"})',
+            SaveEmployeeeData: '@Url.Action("SaveEmployeeeData","Review",new{Area="PBJSnap"})',
+            EmployeeData: '@Url.Action("EmployeeData","Review",new{Area="PBJSnap"})',
+            EditEmployeeData: '@Url.Action("EditEmployeeData","Review",new{Area="PBJSnap"})',
+            DeleteEmployee: '@Url.Action("DeleteEmployee","Review",new{Area="PBJSnap"})',
+            GetEmployeeTimesheet: '@Url.Action("GetEmployeeTimesheet","Review",new{Area="PBJSnap"})',
+            SaveEmployeeWorkingDetails: '@Url.Action("SaveEmployeeWorkingDetails","Review",new{Area="PBJSnap"})',
+            EmployeeMultiDatesSave: '@Url.Action("EmployeeMultiDatesSave","Review",new{Area="PBJSnap"})',
+            DeleteMultipleWorkingHoursDates: '@Url.Action("DeleteMultipleWorkingHoursDates","Review",new{Area="PBJSnap"})',
+            ApproveUploadData: '@Url.Action("ApproveUploadData","Review",new{Area="PBJSnap"})',
+            GetMissingNursesDates: '@Url.Action("GetMissingNursesDates","Review",new{Area="PBJSnap"})',
+            AddMissingNurseHoursData: '@Url.Action("AddMissingNurseHoursData","Review",new{Area="PBJSnap"})',
+            ExportCensusToCsv: '@Url.Action("ExportCensusToCsv","Review",new{Area="PBJSnap"})',
+            ExportStaffingDeptToCsv: '@Url.Action("ExportStaffingDeptToCsv","Review",new{Area="PBJSnap"})',
+            GetEmployeeData: '@Url.Action("GetEmployeeData","Review",new{Area="PBJSnap"})',
+            GetEmployeeName: '@Url.Action("GetEmployeeName","Review",new{Area="PBJSnap"})',
+            GetEmpDetials: '@Url.Action("GetEmployeeDetails","Review",new{Area="PBJSnap"})',
+            CheckIfValidated: '@Url.Action("CheckIfValidated","Review",new{Area="PBJSnap"})',
+            CheckIfApproved: '@Url.Action("CheckIfApproved","Review",new{Area="PBJSnap"})',
+            Validate: '@Url.Action("ValidateData","Review",new{Area="PBJSnap"})',
+            UpdateEmployeeStatus: '@Url.Action("UpdateEmployeeStatus","Review",new{Area="PBJSnap"})',
+            ExportStaff: '@Url.Action("ExportStaff","Review",new{Area="PBJSnap"})',
+            GetStatusValidatedList: '@Url.Action("GetStatusValidatedList","Review",new{Area="PBJSnap"})',
+            GetStatusApprovedList: '@Url.Action("GetStatusApprovedList","Review",new{Area="PBJSnap"})',
+            DeleteTimesheetData: '@Url.Action("DeleteTimesheetData","Review",new{Area="PBJSnap"})',
+            GetSearchedEmployees: '@Url.Action("GetSearchedEmployees","Review",new{Area="PBJSnap"})'
+
+        },
+        Dashboard: {
+            GetThinkaNewTiles: '@Url.Action("GetThinkanewTiles","Home")',
+            GetFacilityListTiles: '@Url.Action("GetDashboardFacilities","Home")',
+            GetLabourcodeTables: '@Url.Action("GetLabourcodeTable","Home")',
+            GetjobTables: '@Url.Action("GetTopJobCode","Home")',
+            GetFacilityItemList: '@Url.Action("GetFacilityItemList","Home")',
+            GetstfData: '@Url.Action("GetStaffingData","Home")',
+            GetBlogs: '@Url.Action("GetCMSFeed","Home")',
+            GetPendingdata: '@Url.Action("GetPendingStaffingdata","Home")',
+            GetSecondaryTiles: '@Url.Action("GetSecondaryTiles","Home")',
+            GetPreviousSubmission: '@Url.Action("GetLastQuarterSubmitHistory","Home")',
+            GetpendingSubmissions: '@Url.Action("GetOrgWisePendingSubmission","Home")',
+            GetSubmissionStatus: '@Url.Action("GetOrgWiseSubmissionStatus","Home")',
+            CheckSessionTimeout: '@Url.Action("CheckSessionTimeout","Home")'
+        },
+        LabourFileMoverurls: {
+            GetKronoFormData: '@Url.Action("GetKronosData","KronosOrgCreds",new{Area="LabourFileMover"})',
+            UpdateKronosForm: '@Url.Action("UpdateKronos","KronosOrgCreds",new{Area="LabourFileMover"})',
+            ChangeKronosStatus: '@Url.Action("ChangeStatus","KronosOrgCreds",new{Area="LabourFileMover"})',
+            GetComparison: '@Url.Action("GetComparisionData","KronosPending",new{Area="LabourFileMover"})' ,
+            UpdateComparison: '@Url.Action("UpdateData","KronosPending",new{Area="LabourFileMover"})',
+            ProcessData: '@Url.Action("ProcessData","KronosHome",new{Area="LabourFileMover"})',
+            addOrgCreds: '@Url.Action("AddCombinedData", "KronosOrgCreds", new { Area = "LabourFileMover" })',
+            Pendingrecords: '@Url.Action("Index", "KronosPending", new { Area = "LabourFileMover" })',
+            GetFacilities: '@Url.Action("GetFacilities", "KronosPending", new { Area = "LabourFileMover" })',
+            GetEmployees: '@Url.Action("GetEmployees", "KronosPending", new { Area = "LabourFileMover" })',
+            OrgCredsCheck: '@Url.Action("CheckOrgCredentials", "KronosOrgCreds", new { Area = "LabourFileMover" })',
+            OrgCredsHome: '@Url.Action("Index", "KronosOrgCreds", new { Area = "LabourFileMover" })'
+        },
+        TelecomReports:
+        {
+            GetCostAnalysisReportList: '@Url.Action("GetCostAnalysisReportList","CallDetails",new{Area="TelecomReporting"})',
+            GetCallSummeryReportList: '@Url.Action("GetCallDetailsData","CallDetails",new{Area="TelecomReporting"})',
+            GetCallDetailsById: '@Url.Action("GetCallDetailsById","CallDetails", new{Area="TelecomReporting"})',
+    ExportCostSummaryToCsv: '@Url.Action("ExportCostSummaryToCsv","CallDetails",new{Area="TelecomReporting"})',
+            UploadFileToAzureBlobStorage: '@Url.Action("UploadFileToAzureBlobStorage","DataService", new{Area="TelecomReporting"})',
+            GetOrganizationFaciltyList: '@Url.Action("GetOrganizationFaciltyList","DataService", new{Area="TelecomReporting"})',
+            GetAllUploadedFileList: '@Url.Action("GetAllUploadedFileList","DataService", new{Area="TelecomReporting"})',
+            ViewFile: '@Url.Action("ViewFile","DataService", new{Area="TelecomReporting"})',
+            GetLoggedInUserInfo: '@Url.Action("GetLoggedInUserInfo","DataService", new{Area="TelecomReporting"})',
+            GetOrganizationUserInfo: '@Url.Action("GetOrganizationUserInfo","DataService", new{Area="TelecomReporting"})',
+            DownLoadFile: '@Url.Action("DownLoadFile","DataService", new{Area="TelecomReporting"})',
+            DeleteFile: '@Url.Action("DeleteFile","DataService", new{Area="TelecomReporting"})',
+            DisplayFile: '@Url.Action("DisplayFile","DataService", new{Area="TelecomReporting"})',
+    DownloadCallDetails: '@Url.Action("ExportCallDetails","CallDetails", new{Area="TelecomReporting"})'
+        },
+        DataServiceType: {
+            SaveDataServiceType: '@Url.Action("SaveDataServiceType","DataServiceType",new{Area="TelecomReporting"})',
+            GetDataServiceTypeList: '@Url.Action("GetDataServiceType","DataServiceType",new{Area="TelecomReporting"})',
+            GetDataServiceTypeById: '@Url.Action("GetDataServiceTypeById","DataServiceType",new{Area="TelecomReporting"})',
+            DeleteDataServiceType: '@Url.Action("DeleteDataServiceTypeById","DataServiceType",new{Area="TelecomReporting"})'
+        },
+        TelecomDataService:
+        {
+            GetDataServiceList: '@Url.Action("GetDataServiceList","DataService",new{Area="TelecomReporting"})',
+            AddDataService: '@Url.Action("AddDataService","DataService",new{Area="TelecomReporting"})',
+            GetDataServiceTypeList: '@Url.Action("GetDataServiceTypeList","DataService",new{Area="TelecomReporting"})',
+            DeleteDataService: '@Url.Action("DeleteDataService","DataService",new{Area="TelecomReporting"})',
+            GetDataServiceById: '@Url.Action("GetDataServiceById","DataService", new{Area="TelecomReporting"})',
+            DownloadContractDocx: '@Url.Action("DownloadContractDocument","DataService", new{Area="TelecomReporting"})'
+        },
+    CarrierManagement:
+        {
+            SaveCarrier: '@Url.Action("SaveCarrier","DataService",new{Area="TelecomReporting"})',
+            GetCarriersList: '@Url.Action("GetCarriersList","DataService",new{Area="TelecomReporting"})',
+            CheckForCarrierName: '@Url.Action("CheckForCarrierName","DataService",new{Area="TelecomReporting"})',
+            EditCarrier: '@Url.Action("EditCarrier","DataService",new{Area="TelecomReporting"})',
+            UpdateCarrier: '@Url.Action("UpdateCarrier","DataService",new{Area="TelecomReporting"})',
+            DeleteCarrier: '@Url.Action("DeleteCarrier","DataService",new{Area="TelecomReporting"})',
+        }
+
+    }
+</script>

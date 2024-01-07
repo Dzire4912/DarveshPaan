@@ -1,0 +1,86 @@
+﻿<@using TAN.DomainModels.Entities;
+ @model TAN.DomainModels.Entities.EditUserViewModel;
+ <div class="container-fluid">
+                <form method="post" asp-action="UpdateUserInfo" asp-antiforgery="true" asp-controller="User" id="UpdateUserInform">
+
+                    <div class="row mb-2">
+                        <div class="col-xl-8 d-flex align-items-end">
+                            <div>
+                                <label for="firstName" class="form-label">User Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edtxtUser" name="userName" placeholder="Enter AD username">
+                            </div>
+                            <button type="button" class="btn btn-primary ms-2" onclick="searchUserFromAd()"><i class="ri-search-2-line"></i></button>
+                            <button type="button" class="btn btn-secondary ms-2" onclick="resetAdUserSearch()"><i class="ri-refresh-line"></i></button>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-xl-6 mb-2">
+                            <div>
+                                <label for="lastName" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="edtxtName" asp for ="@Model.users.FirstName"name="name" placeholder="Enter name">
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-xl-6">
+                            <div>
+                                <label for="emailInput" class="form-label">Email</label>
+                                <input type="email" class="form-control" asp-for="@Model.users.Email" id="txtEmail" name="email" placeholder="Enter email">
+                            </div>
+                        </div><!--end col-->
+
+                    </div>
+
+                    <div class="row mb-2">
+            @* <div class="col-xl-6 mb-2">
+                        <div>
+                        <label for="lastName" class="form-label">Department <span class="text-danger">*</span></label>
+                        <select class="form-select" id="DepartmentName" name="department" asp-items="@(new SelectList(Model.DepartmentList, "Value", "Text"))">
+                        <option value="" selected>Select Department</option>
+                        </select>
+                        <span id="spDepartment" class="text-danger"></span>
+                        </div>
+                        </div><!--end col-->*@
+
+                        <div class="col-xl-6">
+                            <div>
+                                <label for="emailInput" class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-select" id="edUserRole"  name="role" asp-items="@(new SelectList(Model.RoleList, "Value", "Text"))">
+                                    <option value="" selected>Select Role</option>
+                                </select>
+                                <span id="spuserRole" class="text-danger"></span>
+                            </div>
+                            @*<div>
+                                <label for="emailInput" class="form-label">Apps <span class="text-danger">*</span></label>
+                                <select class="form-select" multiple id="edApplication" asp-for="@Model.users.Application_Id" name="apps" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                                </select>
+                                <span id="spapplication" class="text-danger"></span>
+                            </div>*@
+                        </div><!--end col-->
+                        <div class="col-xl-6">
+
+                            <div>
+                                <label for="emailInput" class="form-label">DefaultApp <span class="text-danger">*</span></label>
+                                <select class="form-select" multiple id="edDefaultApplication" asp-for="@Model.users.DefaultAppId" name="defaultApp" asp-items="@(new SelectList(Model.ApplicationList, "Value", "Text"))">
+                                </select>
+                                <span id="spdefaultApplication" class="text-danger"></span>
+                            </div>
+                             <div>
+                               <label for="emailInput" class="form-label">2fa Enabled <span class="text-danger">*</span></label>
+                                <input class="form-check-input" type="checkbox" id="2fa" name="TwoFactor" >
+                                <span id="spdefaultApplication" class="text-danger"></span>
+                            </div>
+                        </div><!--end col-->
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-lg-12">
+                            <div class="hstack gap-2 justify-content-end">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                                <button type="button" onclick="editUser()" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+
+                    </div><!--end row-->
+                </form>
+            </div>
+
+

@@ -1,0 +1,110 @@
+﻿@using TAN.DomainModels.Entities;
+@using Microsoft.AspNetCore.Identity;
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using TAN.DomainModels.Helpers;
+@model TAN.DomainModels.Models.EmployeeModel
+<div class="py-2 border-bottom title-part-padding d-flex justify-content-between align-items-center flex-wrap employee-title-width">
+    <h4 class="card-title mb-0">Staff</h4>
+    <div>
+
+        @if ((AuthorizationService.AuthorizeAsync(User,
+        Permissions.EmployeeMaster.PBJSnapCreate)).Result.Succeeded)
+        {
+            <a href="~/assets/template/employeeimporttemplate.csv">Download Template</a>
+            <button type="button" data-bs-toggle="modal" data-bs-target="#ImportEmployee" class="btn waves-effect waves-light btn-info btn-sm ms-1"> <i class="ri-download-line pe-1"></i>Import</button>
+            <button type="button" data-bs-toggle="modal" onclick="openEmployeeMoal()" data-bs-target="#AddEmployeeModel" class="btn waves-effect waves-light btn-info btn-sm ms-1"> <i class="ri-add-line pe-1"></i>Add Employee</button>
+        }
+    </div>
+</div>
+<div class="card-body">
+    <div class="table-responsive m-t-40">
+        <table id="EmployeeListDataTable" class="table display table-bordered table-striped no-wrap mb-0 w-100 emp-list-table zoomed-table">
+            <thead>
+                <tr>
+                    <th class="id-th">ID</th>
+                    <th>Name</th>
+                    <th class="hire-date-th">Hire Date</th>
+                    <th class="term-date-th">Termination Date</th>
+                    <th class="facility-name-th">Facility Name</th>
+                    <th>Pay Type</th>
+                    <th>Job Title</th>
+                    <th class="create-date-th">Create Date</th>
+                    <th>Action</th>
+
+                </tr>
+            </thead>
+            <tbody id="jobTitileColumn">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="AddEmployeeModel" tabindex="-1" aria-labelledby="AddEmployeeModelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="EmployeeModalLabel">Add Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("EmployeeData", Model.employeePopupModel);
+                @* <partial name="EmployeeData.cshtml" model="Model.employeePopupModel" />*@
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ImportEmployee" tabindex="-1" aria-labelledby="ImportEmployeeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="ImportEmployeeModalLabel">Import Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row d-flex align-items-center">
+                    <div class="col-lg-8" id="filUploadDiv">
+                        <div class="form-group mb-3">
+                            <label class="control-label form-label">Import File <span class="text-danger">*</span></label>
+                            <input type="file" id="file" class="form-control" />
+                            <span class="text-danger errormsg" title="Employee Id" id="Employee_IdError"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 ps-0 pt-2" id="filUploadDiv">
+                        <div class="form-group">
+                            <button type="button" onclick="return importEmpoyeeFile()" class="btn btn-primary">Import</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ImportEmployeeErrorList" tabindex="-1" aria-labelledby="ImportEmployeeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info text-white py-2">
+                <h5 class="modal-title" id="ImportEmployeeModalLabel">Import Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-lg-12">
+                    <table id="EmployeeListDataTable" class="table display table-bordered table-striped no-wrap mb-0">
+                        <thead>
+                            <tr>
+                                <th>Row No</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBodyEmpErrorList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
